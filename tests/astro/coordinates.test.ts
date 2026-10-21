@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest"
 import {
+  GAL_X,
+  GAL_Y,
   GAL_Z,
   equatorialToCartesian,
   equatorialToGalactic,
   galacticAngles,
   galacticToEquatorial,
   galacticVectorIn,
+  dot,
 } from "../../src/astro/coordinates"
+import type { Vec3 } from "../../src/catalog/types"
 
 const anglesOf = (raH: number, decDeg: number) => {
   const angles = galacticAngles(equatorialToGalactic(equatorialToCartesian(raH, decDeg, 10)))
@@ -15,6 +19,20 @@ const anglesOf = (raH: number, decDeg: number) => {
 }
 
 describe("coordinates", () => {
+  it("uses an orthonormal, right-handed rotation matrix", () => {
+    const rows = [GAL_X, GAL_Y, GAL_Z]
+    rows.forEach((a, i) =>
+      rows.forEach((b, j) => expect(dot(a, b)).toBeCloseTo(i === j ? 1 : 0, 12)),
+    )
+    // X × Y = Z holds only for a right-handed frame.
+    const cross: Vec3 = [
+      GAL_X[1] * GAL_Y[2] - GAL_X[2] * GAL_Y[1],
+      GAL_X[2] * GAL_Y[0] - GAL_X[0] * GAL_Y[2],
+      GAL_X[0] * GAL_Y[1] - GAL_X[1] * GAL_Y[0],
+    ]
+    cross.forEach((value, i) => expect(value).toBeCloseTo(GAL_Z[i] ?? NaN, 12))
+  })
+
   it("converts Sirius to its known galactic coordinates", () => {
     const { l, b } = anglesOf(6.752481, -16.716116)
     expect(l).toBeCloseTo(227.23, 1)
