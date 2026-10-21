@@ -339,6 +339,8 @@ export function drawStars(dc: DrawContext, view: RenderView): ProjectedStar[] {
 export function drawLabels(dc: DrawContext, view: RenderView, projected: ProjectedStar[]): void {
   const { ctx, viewport } = dc
   const { selected, observer, labelMode } = view
+  // "None" hides every star label, including the pinned selected and observer labels.
+  if (labelMode === "none") return
   const rank = (p: ProjectedStar): number => {
     const star = p.item.star
     if (star === selected) return 100
@@ -348,8 +350,7 @@ export function drawLabels(dc: DrawContext, view: RenderView, projected: Project
   const candidates = projected
     .filter((p) => {
       const star = p.item.star
-      if (star === selected || star === observer) return true
-      return labelMode !== "none" && (labelMode === "all" || star.priority >= 4)
+      return star === selected || star === observer || labelMode === "all" || star.priority >= 4
     })
     .sort((a, b) => rank(b) - rank(a))
 
