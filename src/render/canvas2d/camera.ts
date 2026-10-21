@@ -27,7 +27,7 @@ const PERSPECTIVE_DISTANCE = 240
 
 export function defaultAngles(mode: CoordMode): CameraAngles {
   return mode === "gal"
-    ? { yaw: 2.76, pitch: 0.29, zoom: 0.95 }
+    ? { yaw: 0.36, pitch: 0.29, zoom: 0.95 }
     : { yaw: -0.57, pitch: 0.4, zoom: 1 }
 }
 
@@ -41,7 +41,8 @@ export function project(angles: CameraAngles, viewport: Viewport, [x, y, z]: Vec
   const sy = Math.sin(angles.yaw)
   const cp = Math.cos(angles.pitch)
   const sp = Math.sin(angles.pitch)
-  const xx = x * cy - y * sy
+  // Screen right is up × toward-viewer, which keeps the projection right-handed.
+  const xx = y * sy - x * cy
   const yy = x * sy + y * cy
   const up = z * cp - yy * sp
   const depth = yy * cp + z * sp
