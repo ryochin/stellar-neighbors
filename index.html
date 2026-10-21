@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Solar Neighborhood 3D Star Map</title>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="side">
+        <div>
+          <div class="kicker">SOLAR NEIGHBORHOOD · INTERACTIVE ATLAS</div>
+          <h1>The Solar Neighborhood<br />in 3D, 100 Light-Years Across</h1>
+          <p class="sub">
+            Default: galactic coordinates, a 100 ly cube centered on the Sun<br />Switchable to
+            J2000 equatorial coordinates
+          </p>
+        </div>
+        <div class="statbar">
+          <div class="stat">
+            <div class="number" id="starCount">—</div>
+            <small>Stars and systems shown</small>
+          </div>
+          <div class="stat">
+            <div class="number" id="cubeSpanValue">
+              100 <small style="display: inline">ly</small>
+            </div>
+            <small>Cube edge length</small>
+          </div>
+        </div>
+        <div class="observer-box" aria-live="polite">
+          <div class="observer-top">
+            <div>
+              <small>Current observer</small>
+              <div><strong id="observerName">Sun</strong></div>
+            </div>
+            <button
+              class="mini-button"
+              id="returnSun"
+              type="button"
+              title="Move the observer back to the Sun"
+            >
+              ☉ Back to the Sun
+            </button>
+          </div>
+          <div class="observer-presets">
+            <button class="mini-button" id="observeSirius" type="button">View from Sirius</button>
+            <button class="mini-button" id="observeProxima" type="button">View from Proxima</button>
+          </div>
+          <div class="observer-explain">
+            Select a star and press "Observe from this star" to move the distances, the star list
+            and the cube origin there. The axes keep their orientation.
+          </div>
+        </div>
+        <div class="data-box" aria-live="polite">
+          <p class="data-status" id="dataStatus">Loading star catalog…</p>
+          <div class="data-tools">
+            <button id="retryLoad" type="button" hidden>↻ Retry</button>
+          </div>
+          <div class="filter-row">
+            <span>Max distance</span>
+            <input
+              id="distanceRange"
+              type="range"
+              min="5"
+              max="87"
+              value="87"
+              step="1"
+              aria-label="Maximum distance from the observer"
+            />
+            <output id="distanceValue">87 ly</output>
+          </div>
+          <div class="small-note">
+            Includes the stars of HYG v4.1 within about 173 ly of the Sun (about 9,600 entries), so
+            nearby stars still show up after you move the observer. Stars missing from the catalog
+            are not shown.
+          </div>
+        </div>
+        <div class="panel">
+          <div class="guide-title">Coordinates and the galactic plane</div>
+          <p>
+            By default the XYZ axes follow galactic coordinates: the XY plane is the galactic plane
+            (latitude b = 0°) and the Z axis points to the north galactic pole. Switch to J2000
+            equatorial coordinates to compare the same stars against another reference frame.
+          </p>
+          <div class="key">
+            <span class="gp">Galactic plane</span><span class="gc">Galactic center</span
+            ><span class="gn">North galactic pole</span>
+          </div>
+        </div>
+        <input
+          id="search"
+          class="search"
+          type="search"
+          placeholder="Search stars (e.g. Sirius)"
+          aria-label="Search stars by name"
+        />
+        <div class="heading">
+          <span>Stars</span><span id="distanceSortLabel">By distance from the observer (ly)</span>
+        </div>
+        <div id="focusedNote" class="focused-note" aria-live="polite"></div>
+        <div
+          id="starlist"
+          class="starlist"
+          aria-label="Star list. The selected star is cyan and the observer is gold"
+        ></div>
+        <div id="selected" class="selected" aria-live="polite"></div>
+        <div class="source">
+          "View from another star" is a geometric comparison of distances between stars. It reflects
+          parallax but not light travel time, proper motion or how bright the sky would really
+          look.<br />
+          Positions and distances:
+          <a href="https://github.com/astronexus/HYG-Database" target="_blank" rel="noopener"
+            >HYG v4.1 (David Nash, CC BY-SA 4.0)</a
+          >, processed (stars within about 173 ly of the Sun, with Japanese names added for major
+          stars). The processed data is also provided under CC BY-SA 4.0. Galactic coordinate
+          transform:
+          <a
+            href="https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu3ast/sec_cu3ast_intro/ssec_cu3ast_intro_tansforms.html"
+            target="_blank"
+            rel="noopener"
+            >ESA Gaia DR3</a
+          >. HYG does not cover every star, and star sizes are schematic. Switching coordinates
+          turns the cube, so the set of stars inside it changes.
+        </div>
+      </aside>
+      <div class="stage" id="stage">
+        <div class="legend" id="legend"></div>
+        <div class="toolbar">
+          <button
+            class="tool active"
+            id="coords"
+            type="button"
+            title="Switch between galactic and equatorial coordinates"
+          >
+            Frame: Galactic
+          </button>
+          <button class="tool active" id="units" type="button" title="Switch the distance unit">
+            Units: ly
+          </button>
+          <button
+            class="tool active"
+            id="labels"
+            type="button"
+            title="Cycle labels: major, all, none"
+          >
+            Labels: Major
+          </button>
+          <button class="tool active" id="grid" type="button" title="Show or hide the grid">
+            Grid
+          </button>
+          <button
+            class="tool active"
+            id="galactic"
+            type="button"
+            title="Show or hide the galactic plane (b = 0°)"
+          >
+            Galactic plane: ON
+          </button>
+          <button
+            class="tool"
+            id="galview"
+            type="button"
+            title="Look down on the galactic plane from the north galactic pole"
+          >
+            ↗ Top-down view
+          </button>
+          <button class="tool" id="reset" type="button" title="Reset the view angle (R)">
+            ↺ Reset view
+          </button>
+        </div>
+        <div class="tooltip" id="tooltip"></div>
+        <div class="instructions">
+          Drag: rotate / Wheel: zoom / Click a star: details<br />Select a star, then "Observe from
+          this star" / Double-click or R: reset view
+        </div>
+        <div class="hint" id="hint"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
