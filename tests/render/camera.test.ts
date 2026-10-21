@@ -11,14 +11,14 @@ describe("project", () => {
   it("maps the origin to the stage anchor point", () => {
     const p = project(defaultAngles("gal"), viewport, [0, 0, 0])
     expect(p.x).toBeCloseTo(510, 9)
-    expect(p.y).toBeCloseTo(416, 9)
+    expect(p.y).toBeCloseTo(400, 9)
     expect(p.f).toBe(1)
   })
 
   it("puts +x to the left and +z up when looking from +y toward the origin", () => {
     const angles = { yaw: 0, pitch: 0, zoom: 1 }
     expect(project(angles, viewport, [10, 0, 0]).x).toBeCloseTo(510 - 10 * scale, 9)
-    expect(project(angles, viewport, [0, 0, 10]).y).toBeCloseTo(416 - 10 * scale, 9)
+    expect(project(angles, viewport, [0, 0, 10]).y).toBeCloseTo(400 - 10 * scale, 9)
   })
 
   it("keeps the axes right-handed (screen right × up = toward the viewer)", () => {
@@ -29,10 +29,16 @@ describe("project", () => {
       { yaw: -2.1, pitch: -1.2, zoom: 3 },
     ]) {
       // Undo the perspective so each row is the axis in (right, up, toward-viewer) form.
-      const rows: number[][] = ([[1, 0, 0], [0, 1, 0], [0, 0, 1]] as const).map((axis) => {
+      const rows: number[][] = (
+        [
+          [1, 0, 0],
+          [0, 1, 0],
+          [0, 0, 1],
+        ] as const
+      ).map((axis) => {
         const p = project(angles, viewport, axis)
         const s = scale * angles.zoom * p.f
-        return [(p.x - 510) / s, (416 - p.y) / s, p.depth]
+        return [(p.x - 510) / s, (400 - p.y) / s, p.depth]
       })
       const [a, b, c] = rows
       const det: number =
@@ -47,7 +53,7 @@ describe("project", () => {
     const angles = galacticPoleAngles("gal")
     const toScreen = (p: Vec3): [number, number] => {
       const q = project(angles, viewport, p)
-      return [q.x - 510, 416 - q.y]
+      return [q.x - 510, 400 - q.y]
     }
     const [x1, y1] = toScreen([10, 0, 0])
     const [x2, y2] = toScreen([0, 10, 0])

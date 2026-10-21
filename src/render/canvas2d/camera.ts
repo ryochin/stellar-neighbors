@@ -25,10 +25,13 @@ export const MAX_ZOOM = 12
 export const PITCH_LIMIT = 1.47
 const PERSPECTIVE_DISTANCE = 240
 
+// Small enough to keep the axis labels clear of the toolbar and legend on a 1440px screen.
+const DEFAULT_ZOOM = 0.95
+
 export function defaultAngles(mode: CoordMode): CameraAngles {
   return mode === "gal"
-    ? { yaw: 0.36, pitch: 0.29, zoom: 0.95 }
-    : { yaw: -0.57, pitch: 0.4, zoom: 1 }
+    ? { yaw: 0.36, pitch: 0.29, zoom: DEFAULT_ZOOM }
+    : { yaw: -0.57, pitch: 0.4, zoom: DEFAULT_ZOOM }
 }
 
 export function galacticPoleAngles(mode: CoordMode): CameraAngles {
@@ -50,7 +53,7 @@ export function project(angles: CameraAngles, viewport: Viewport, [x, y, z]: Vec
   const scale = Math.min(viewport.width / 140, viewport.height / 144) * angles.zoom
   return {
     x: viewport.width * 0.51 + xx * scale * f,
-    y: viewport.height * 0.52 - up * scale * f,
+    y: viewport.height * 0.5 - up * scale * f,
     depth,
     f,
   }
