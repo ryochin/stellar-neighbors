@@ -21,12 +21,14 @@ export interface Projected {
 }
 
 export const MIN_ZOOM = 0.5
-export const MAX_ZOOM = 4
+export const MAX_ZOOM = 12
 export const PITCH_LIMIT = 1.47
 const PERSPECTIVE_DISTANCE = 240
 
 export function defaultAngles(mode: CoordMode): CameraAngles {
-  return mode === "gal" ? { yaw: 0.88, pitch: 0.48, zoom: 1 } : { yaw: -0.57, pitch: 0.4, zoom: 1 }
+  return mode === "gal"
+    ? { yaw: 2.76, pitch: 0.29, zoom: 0.95 }
+    : { yaw: -0.57, pitch: 0.4, zoom: 1 }
 }
 
 export function galacticPoleAngles(mode: CoordMode): CameraAngles {

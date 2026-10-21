@@ -56,9 +56,10 @@ export function mountToolbar(
 
   const render = (state: AppState): void => {
     const mode = COORD_MODES[state.coordMode]
-    const unit = UNITS[state.unitMode].label
+    const { label: unit, name: unitName } = UNITS[state.unitMode]
     coords.textContent = `Frame: ${mode.label}`
     units.textContent = `Units: ${unit}`
+    units.title = `Switch the distance unit (now: ${unitName})`
     labels.textContent = LABEL_TEXT[state.labelMode]
     labels.classList.toggle("active", state.labelMode !== "none")
     grid.classList.toggle("active", state.showGrid)

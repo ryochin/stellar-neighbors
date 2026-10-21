@@ -5,6 +5,7 @@ export const MEGA_AU_PER_LY = 0.063241077
 
 interface UnitDefinition {
   label: string
+  name: string
   fromLy: (ly: number) => number
   digits: (value: number) => number
 }
@@ -12,10 +13,11 @@ interface UnitDefinition {
 const distanceDigits = (value: number): number => (value < 10 ? 2 : value < 100 ? 1 : 0)
 
 export const UNITS: Record<UnitMode, UnitDefinition> = {
-  ly: { label: "ly", fromLy: (ly) => ly, digits: distanceDigits },
-  pc: { label: "pc", fromLy: (ly) => ly / LY_PER_PC, digits: distanceDigits },
+  ly: { label: "ly", name: "light-years", fromLy: (ly) => ly, digits: distanceDigits },
+  pc: { label: "pc", name: "parsecs", fromLy: (ly) => ly / LY_PER_PC, digits: distanceDigits },
   mau: {
     label: "MAU",
+    name: "mega astronomical units",
     fromLy: (ly) => ly * MEGA_AU_PER_LY,
     digits: (value) => (value === 0 ? 0 : value < 1 ? 3 : 2),
   },
