@@ -399,10 +399,23 @@ canvas {
   border-color: #4790a5;
   background: #133248;
 }
+/* Translucent backing so the overlay text stays readable over stars and labels.
+   The boxes sit 9px further out than the text used to, so the text itself keeps its place. */
+.overlay-box {
+  padding: 5px 9px;
+  background: rgba(7, 18, 30, 0.4);
+  border: 1px solid rgba(40, 64, 87, 0.4);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+}
+.legend .overlay-box {
+  display: inline-block;
+  margin: -3px 0 0 -9px;
+}
 .instructions {
   position: absolute;
-  left: 24px;
-  bottom: 23px;
+  left: 15px;
+  bottom: 18px;
   pointer-events: none;
   color: #93aabc;
   font-size: 11px;
@@ -411,8 +424,8 @@ canvas {
 }
 .hint {
   position: absolute;
-  right: 23px;
-  bottom: 23px;
+  right: 14px;
+  bottom: 18px;
   pointer-events: none;
   text-align: right;
   color: #6b90a9;
