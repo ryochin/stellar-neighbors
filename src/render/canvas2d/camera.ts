@@ -36,6 +36,27 @@ export function galacticPoleAngles(): CameraAngles {
   return { yaw: 0, pitch: Math.PI / 2, zoom: 1.08 }
 }
 
+export function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
+}
+
+// Wraps an angle difference into [-π, π) so the yaw turns the short way round.
+function shortestAngleDelta(from: number, to: number): number {
+  const delta: number = (to - from) % (2 * Math.PI)
+  if (delta >= Math.PI) return delta - 2 * Math.PI
+  if (delta < -Math.PI) return delta + 2 * Math.PI
+  return delta
+}
+
+/** Camera angles at progress t (0..1, already eased); zoom changes at a constant ratio. */
+export function interpolateAngles(from: CameraAngles, to: CameraAngles, t: number): CameraAngles {
+  return {
+    yaw: from.yaw + shortestAngleDelta(from.yaw, to.yaw) * t,
+    pitch: from.pitch + (to.pitch - from.pitch) * t,
+    zoom: from.zoom * (to.zoom / from.zoom) ** t,
+  }
+}
+
 export function project(angles: CameraAngles, viewport: Viewport, [x, y, z]: Vec3): Projected {
   const cy = Math.cos(angles.yaw)
   const sy = Math.sin(angles.yaw)

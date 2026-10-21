@@ -5,7 +5,9 @@ import {
   MIN_ZOOM,
   PITCH_LIMIT,
   defaultAngles,
+  easeInOutCubic,
   galacticPoleAngles,
+  interpolateAngles,
   type CameraAngles,
 } from "./camera"
 import {
@@ -22,6 +24,7 @@ import {
 
 const PICK_RADIUS_PX = 15
 const DRAG_THRESHOLD_PX = 4
+const VIEW_TRANSITION_MS = 500
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v))
 
 function getContext2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
@@ -41,6 +44,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   let angles: CameraAngles = defaultAngles()
   let viewport = { width: 0, height: 0 }
   let projected: ProjectedStar[] = []
+  let animationFrame: number | null = null
   const drag = { active: false, moved: false, startX: 0, startY: 0, lastX: 0, lastY: 0 }
 
   const stageElement = (): HTMLElement => {
@@ -59,6 +63,33 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
     drawLabels(dc, view, projected)
     drawGalacticAnnotations(dc, view)
     drawCelestialEquatorAnnotations(dc, view)
+  }
+
+  function stopAnimation(): void {
+    if (animationFrame === null) return
+    cancelAnimationFrame(animationFrame)
+    animationFrame = null
+  }
+
+  // Eases the camera from where it is now to the target; user input stops it midway.
+  function animateTo(target: CameraAngles): void {
+    stopAnimation()
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      angles = target
+      draw()
+      return
+    }
+    const from: CameraAngles = angles
+    let start: number | null = null
+    const step = (now: number): void => {
+      start ??= now
+      const t: number = Math.min(1, (now - start) / VIEW_TRANSITION_MS)
+      // Land exactly on the target; the shortest-way yaw can differ from it by whole turns.
+      angles = t < 1 ? interpolateAngles(from, target, easeInOutCubic(t)) : target
+      animationFrame = t < 1 ? requestAnimationFrame(step) : null
+      draw()
+    }
+    animationFrame = requestAnimationFrame(step)
   }
 
   function starAt(x: number, y: number): Star | null {
@@ -83,6 +114,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
 
   function onPointerDown(e: PointerEvent): void {
     if (isOnControl(e)) return
+    stopAnimation()
     const [x, y] = pointerPosition(e)
     Object.assign(drag, { active: true, moved: false, startX: x, startY: y, lastX: x, lastY: y })
     stageElement().classList.add("dragging")
@@ -130,6 +162,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
 
   function onWheel(e: WheelEvent): void {
     e.preventDefault()
+    stopAnimation()
     angles = {
       ...angles,
       zoom: clamp(angles.zoom * Math.exp(-e.deltaY * 0.0011), MIN_ZOOM, MAX_ZOOM),
@@ -152,8 +185,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   }
 
   function resetView(): void {
-    angles = defaultAngles()
-    draw()
+    animateTo(defaultAngles())
   }
 
   return {
@@ -179,11 +211,11 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
     },
     resetView,
     lookFromGalacticPole() {
-      angles = galacticPoleAngles()
-      draw()
+      animateTo(galacticPoleAngles())
     },
     resize,
     dispose() {
+      stopAnimation()
       const container = stageElement()
       container.removeEventListener("pointerdown", onPointerDown)
       container.removeEventListener("pointermove", onPointerMove)

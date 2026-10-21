@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 import type { Vec3 } from "../../src/catalog/types"
-import { defaultAngles, galacticPoleAngles, project } from "../../src/render/canvas2d/camera"
+import {
+  defaultAngles,
+  easeInOutCubic,
+  galacticPoleAngles,
+  interpolateAngles,
+  project,
+} from "../../src/render/canvas2d/camera"
 
 const viewport = { width: 1000, height: 800 }
 // min(1000 / 140, 800 / 144)
@@ -73,5 +79,53 @@ describe("galacticPoleAngles", () => {
     const angles = galacticPoleAngles()
     expect(angles.pitch).toBeCloseTo(Math.PI / 2, 9)
     expect(angles.zoom).toBe(1.08)
+  })
+})
+
+describe("easeInOutCubic", () => {
+  it("starts at 0, passes 0.5 halfway and ends at 1", () => {
+    expect(easeInOutCubic(0)).toBe(0)
+    expect(easeInOutCubic(0.5)).toBeCloseTo(0.5, 12)
+    expect(easeInOutCubic(1)).toBe(1)
+  })
+
+  it("never moves backward", () => {
+    let previous = 0
+    for (let i = 1; i <= 100; i++) {
+      const value = easeInOutCubic(i / 100)
+      expect(value).toBeGreaterThanOrEqual(previous)
+      previous = value
+    }
+  })
+})
+
+describe("interpolateAngles", () => {
+  const from = { yaw: 0.36, pitch: 0.29, zoom: 0.95 }
+  const to = { yaw: 0, pitch: Math.PI / 2, zoom: 1.08 }
+
+  it("matches the endpoints", () => {
+    expect(interpolateAngles(from, to, 0)).toEqual(from)
+    const end = interpolateAngles(from, to, 1)
+    expect(end.yaw).toBeCloseTo(to.yaw, 12)
+    expect(end.pitch).toBeCloseTo(to.pitch, 12)
+    expect(end.zoom).toBeCloseTo(to.zoom, 12)
+  })
+
+  it("turns the yaw the short way round", () => {
+    // 3.0 → -3.0 is 0.28 rad forward across ±π, not 6 rad backward.
+    const mid = interpolateAngles({ ...from, yaw: 3 }, { ...to, yaw: -3 }, 0.5)
+    expect(mid.yaw).toBeCloseTo(3 + (2 * Math.PI - 6) / 2, 12)
+  })
+
+  it("ignores whole turns the yaw has piled up from dragging", () => {
+    const end = interpolateAngles({ ...from, yaw: 0.36 + 4 * Math.PI }, to, 1)
+    expect(Math.cos(end.yaw)).toBeCloseTo(Math.cos(to.yaw), 12)
+    expect(Math.sin(end.yaw)).toBeCloseTo(Math.sin(to.yaw), 12)
+    expect(Math.abs(end.yaw - (0.36 + 4 * Math.PI))).toBeLessThanOrEqual(Math.PI)
+  })
+
+  it("changes the zoom at a constant ratio", () => {
+    const mid = interpolateAngles({ ...from, zoom: 1 }, { ...to, zoom: 4 }, 0.5)
+    expect(mid.zoom).toBeCloseTo(2, 12)
   })
 })
