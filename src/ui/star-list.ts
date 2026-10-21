@@ -6,15 +6,7 @@ import type { Store } from "../state/store"
 import { byId, escapeHtml } from "./dom"
 
 const LIST_LIMIT = 240
-const KEYS = [
-  "stars",
-  "observer",
-  "selected",
-  "coordMode",
-  "unitMode",
-  "maxRadius",
-  "searchQuery",
-] as const
+const KEYS = ["stars", "observer", "selected", "unitMode", "maxRadius", "searchQuery"] as const
 
 // "Selected" is the focused star; "observer" is the coordinate origin. They are independent.
 function renderEntry(star: Star, state: AppState): string {

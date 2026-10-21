@@ -8,7 +8,7 @@ import {
 } from "../../src/state/app-state"
 import { createStore, type Store } from "../../src/state/store"
 import type { CatalogMeta } from "../../src/catalog/types"
-import { makeStar, makeStarFromGal } from "../helpers"
+import { makeStarFromGal } from "../helpers"
 
 const META: CatalogMeta = {
   source: "test",
@@ -20,7 +20,6 @@ const sun = makeStarFromGal("sun", [0, 0, 0], { name: "Sun", nameJa: "太陽" })
 const near = makeStarFromGal("near", [10, 0, 0])
 const mid = makeStarFromGal("mid", [40, 0, 0], { name: "Mid", nameJa: "ミッド" })
 const far = makeStarFromGal("far", [90, 0, 0])
-const eqOnly = makeStar("eqOnly", [49, 49, 0])
 
 let store: Store<AppState>
 let actions: AppActions
@@ -28,7 +27,7 @@ let actions: AppActions
 beforeEach(() => {
   store = createStore(createInitialState())
   actions = createActions(store)
-  actions.catalogLoaded([sun, near, mid, far, eqOnly], META)
+  actions.catalogLoaded([sun, near, mid, far], META)
 })
 
 describe("app actions", () => {
@@ -67,10 +66,12 @@ describe("app actions", () => {
     expect(store.getState().observer).toBe(mid)
   })
 
-  it("switches the cube frame with the coordinate mode", () => {
-    expect(getActiveStars(store.getState())).not.toContain(eqOnly)
-    actions.toggleCoordMode()
-    expect(getActiveStars(store.getState())).toContain(eqOnly)
+  it("starts with the celestial equator hidden and toggles it", () => {
+    expect(store.getState().showCelestialEquator).toBe(false)
+    actions.toggleCelestialEquator()
+    expect(store.getState().showCelestialEquator).toBe(true)
+    actions.toggleCelestialEquator()
+    expect(store.getState().showCelestialEquator).toBe(false)
   })
 
   it("memoizes the active set for identical inputs", () => {

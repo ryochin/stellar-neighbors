@@ -3,11 +3,12 @@ import {
   GAL_X,
   GAL_Y,
   GAL_Z,
+  NORTH_CELESTIAL_POLE,
   equatorialToCartesian,
   equatorialToGalactic,
   galacticAngles,
   galacticToEquatorial,
-  galacticVectorIn,
+  galacticVector,
   dot,
 } from "../../src/astro/coordinates"
 import type { Vec3 } from "../../src/catalog/types"
@@ -55,11 +56,16 @@ describe("coordinates", () => {
     back.forEach((value, i) => expect(value).toBeCloseTo(v[i] ?? NaN, 9))
   })
 
-  it("expresses the galactic pole in either frame", () => {
-    expect(galacticVectorIn("gal", 0, 1, 90).map((v) => Number(v.toFixed(9)))).toEqual([0, 0, 1])
-    galacticVectorIn("eq", 0, 1, 90).forEach((value, i) =>
-      expect(value).toBeCloseTo(GAL_Z[i] ?? NaN, 9),
-    )
+  it("builds vectors from galactic longitude and latitude", () => {
+    expect(galacticVector(0, 1, 90).map((v) => Number(v.toFixed(9)))).toEqual([0, 0, 1])
+    expect(galacticVector(90, 2).map((v) => Number(v.toFixed(9)))).toEqual([0, 2, 0])
+  })
+
+  it("places the north celestial pole at l = 122.93°, b = 27.13°", () => {
+    expect(Math.hypot(...NORTH_CELESTIAL_POLE)).toBeCloseTo(1, 12)
+    const angles = galacticAngles(NORTH_CELESTIAL_POLE)
+    expect(angles?.l).toBeCloseTo(122.93, 2)
+    expect(angles?.b).toBeCloseTo(27.13, 2)
   })
 
   it("returns null angles for the origin", () => {

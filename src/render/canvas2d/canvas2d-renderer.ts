@@ -1,4 +1,3 @@
-import type { CoordMode } from "../../astro/coordinates"
 import type { Star } from "../../catalog/types"
 import type { RenderView, RendererCallbacks, StarRenderer } from "../renderer"
 import {
@@ -11,6 +10,8 @@ import {
 } from "./camera"
 import {
   drawBackground,
+  drawCelestialEquator,
+  drawCelestialEquatorAnnotations,
   drawCube,
   drawGalacticAnnotations,
   drawGalacticPlane,
@@ -37,7 +38,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   let stage: HTMLElement | null = null
   let resizeObserver: ResizeObserver | null = null
   let view: RenderView | null = null
-  let angles: CameraAngles = defaultAngles("gal")
+  let angles: CameraAngles = defaultAngles()
   let viewport = { width: 0, height: 0 }
   let projected: ProjectedStar[] = []
   const drag = { active: false, moved: false, startX: 0, startY: 0, lastX: 0, lastY: 0 }
@@ -53,9 +54,11 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
     drawBackground(dc)
     drawCube(dc, view)
     drawGalacticPlane(dc, view)
+    drawCelestialEquator(dc, view)
     projected = drawStars(dc, view)
     drawLabels(dc, view, projected)
     drawGalacticAnnotations(dc, view)
+    drawCelestialEquatorAnnotations(dc, view)
   }
 
   function starAt(x: number, y: number): Star | null {
@@ -135,7 +138,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   }
 
   function onDoubleClick(e: MouseEvent): void {
-    if (!isOnControl(e) && view) resetView(view.coordMode)
+    if (!isOnControl(e)) resetView()
   }
 
   function resize(): void {
@@ -148,8 +151,8 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
     draw()
   }
 
-  function resetView(mode: CoordMode): void {
-    angles = defaultAngles(mode)
+  function resetView(): void {
+    angles = defaultAngles()
     draw()
   }
 
@@ -176,7 +179,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
     },
     resetView,
     lookFromGalacticPole() {
-      angles = galacticPoleAngles(view?.coordMode ?? "gal")
+      angles = galacticPoleAngles()
       draw()
     },
     resize,

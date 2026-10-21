@@ -1,4 +1,9 @@
-import { galacticPoleIn, galacticVectorIn } from "../../astro/coordinates"
+import {
+  NORTH_CELESTIAL_POLE,
+  equatorialToCartesian,
+  equatorialToGalactic,
+  galacticVector,
+} from "../../astro/coordinates"
 import { UNITS, formatAxisValue } from "../../astro/units"
 import { CUBE_HALF_LY } from "../../astro/visibility"
 import type { Vec3 } from "../../catalog/types"
@@ -136,7 +141,7 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
   drawAxisTicks(dc, view)
 
   const { ctx } = dc
-  const names = view.coordMode === "gal" ? ["Xg", "Yg", "Zg"] : ["Xe", "Ye", "Ze"]
+  const names = ["Xg", "Yg", "Zg"]
   const colors = ["#e5a5a0", "#a0deba", "#a4c6f0"]
   const tips: Vec3[] = [
     [53, 0, 0],
@@ -161,14 +166,12 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
 
 // The galactic plane passes through the Sun, so relative to the observer it shifts along the pole.
 const planeOffset = (view: RenderView): number => -view.observer.gal[2]
-const planeCenter = (view: RenderView): Vec3 =>
-  scale(galacticPoleIn(view.coordMode), planeOffset(view))
+const planeCenter = (view: RenderView): Vec3 => [0, 0, planeOffset(view)]
 
 export function drawGalacticPlane(dc: DrawContext, view: RenderView): void {
   if (!view.showGalacticPlane) return
   const { ctx } = dc
-  const mode = view.coordMode
-  const polygon = clipPlaneToCube(galacticPoleIn(mode), planeOffset(view), H)
+  const polygon = clipPlaneToCube([0, 0, 1], planeOffset(view), H)
   if (polygon.length >= 3) {
     ctx.beginPath()
     polygon.forEach((v, i) => {
@@ -187,7 +190,7 @@ export function drawGalacticPlane(dc: DrawContext, view: RenderView): void {
     for (const radius of [10, 20, 30, 40, 50]) {
       ctx.beginPath()
       for (let l = 0; l <= 360; l += 5) {
-        const p = proj(dc, add(origin, galacticVectorIn(mode, l, radius)))
+        const p = proj(dc, add(origin, galacticVector(l, radius)))
         if (l === 0) ctx.moveTo(p.x, p.y)
         else ctx.lineTo(p.x, p.y)
       }
@@ -199,12 +202,40 @@ export function drawGalacticPlane(dc: DrawContext, view: RenderView): void {
       ctx.setLineDash([])
     }
     for (let l = 0; l < 360; l += 30) {
-      line(dc, origin, add(origin, galacticVectorIn(mode, l, 50)), "rgba(107,210,198,.13)", 0.75)
+      line(dc, origin, add(origin, galacticVector(l, 50)), "rgba(107,210,198,.13)", 0.75)
     }
   }
-  arrow(dc, [0, 0, 0], galacticVectorIn(mode, 0, 45), "rgba(255,197,120,.96)", 1.9)
-  arrow(dc, [0, 0, 0], galacticVectorIn(mode, 0, 43, 90), "rgba(141,184,255,.96)", 1.9)
-  line(dc, [0, 0, 0], galacticVectorIn(mode, 0, 38, -90), "rgba(141,184,255,.28)", 1, [4, 5])
+  arrow(dc, [0, 0, 0], galacticVector(0, 45), "rgba(255,197,120,.96)", 1.9)
+  arrow(dc, [0, 0, 0], galacticVector(0, 43, 90), "rgba(141,184,255,.96)", 1.9)
+  line(dc, [0, 0, 0], galacticVector(0, 38, -90), "rgba(141,184,255,.28)", 1, [4, 5])
+}
+
+// The celestial equator also passes through the Sun, so it shifts along its pole like the galactic plane.
+const equatorOffset = (view: RenderView): number => -view.observer.eq[2]
+const NCP_ARROW = scale(NORTH_CELESTIAL_POLE, 43)
+
+export function drawCelestialEquator(dc: DrawContext, view: RenderView): void {
+  if (!view.showCelestialEquator) return
+  const { ctx } = dc
+  const polygon = clipPlaneToCube(NORTH_CELESTIAL_POLE, equatorOffset(view), H)
+  if (polygon.length >= 3) {
+    ctx.beginPath()
+    polygon.forEach((v, i) => {
+      const p = proj(dc, v)
+      if (i === 0) ctx.moveTo(p.x, p.y)
+      else ctx.lineTo(p.x, p.y)
+    })
+    ctx.closePath()
+    ctx.fillStyle = "rgba(186,150,255,.07)"
+    ctx.fill()
+    ctx.strokeStyle = "rgba(200,170,255,.62)"
+    ctx.lineWidth = 1.1
+    ctx.setLineDash([6, 5])
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
+  arrow(dc, [0, 0, 0], NCP_ARROW, "rgba(208,180,255,.96)", 1.9)
+  line(dc, [0, 0, 0], scale(NORTH_CELESTIAL_POLE, -38), "rgba(208,180,255,.28)", 1, [4, 5])
 }
 
 function annotatePoint(
@@ -236,9 +267,8 @@ function annotatePoint(
 
 export function drawGalacticAnnotations(dc: DrawContext, view: RenderView): void {
   if (!view.showGalacticPlane) return
-  const mode = view.coordMode
-  annotatePoint(dc, galacticVectorIn(mode, 0, 45), "Galactic center · l=0°", "#ffd19a", -10, -32)
-  const pole = galacticVectorIn(mode, 0, 43, 90)
+  annotatePoint(dc, galacticVector(0, 45), "Galactic center · l=0°", "#ffd19a", -10, -32)
+  const pole = galacticVector(0, 43, 90)
   const n = proj(dc, pole)
   const c = proj(dc, [0, 0, 0])
   if (Math.hypot(n.x - c.x, n.y - c.y) > 28) {
@@ -247,7 +277,7 @@ export function drawGalacticAnnotations(dc: DrawContext, view: RenderView): void
   if (Math.abs(view.observer.gal[2]) <= H) {
     annotatePoint(
       dc,
-      add(planeCenter(view), galacticVectorIn(mode, 226, 34)),
+      add(planeCenter(view), galacticVector(226, 34)),
       "Galactic plane · b=0°",
       "#84eadb",
       7,
@@ -350,5 +380,28 @@ export function drawLabels(dc: DrawContext, view: RenderView, projected: Project
     ctx.strokeText(label, x, y)
     ctx.fillStyle = star === selected ? "#a0f3ff" : star === observer ? "#69eeef" : "#d3e5f5"
     ctx.fillText(label, x, y)
+  }
+}
+
+// Where the equator label sits: a point on the equator, away from the galactic plane label.
+const EQUATOR_LABEL_DIR = equatorialToGalactic(equatorialToCartesian(18, 0, 34))
+
+export function drawCelestialEquatorAnnotations(dc: DrawContext, view: RenderView): void {
+  if (!view.showCelestialEquator) return
+  const n = proj(dc, NCP_ARROW)
+  const c = proj(dc, [0, 0, 0])
+  if (Math.hypot(n.x - c.x, n.y - c.y) > 28) {
+    annotatePoint(
+      dc,
+      NCP_ARROW,
+      "North celestial pole (toward Polaris) · δ=+90°",
+      "#d2bcff",
+      10,
+      -26,
+    )
+  }
+  const anchor = add(scale(NORTH_CELESTIAL_POLE, equatorOffset(view)), EQUATOR_LABEL_DIR)
+  if (anchor.every((v) => Math.abs(v) <= H)) {
+    annotatePoint(dc, anchor, "Celestial equator · δ=0°", "#c9b2ff", 7, 12)
   }
 }

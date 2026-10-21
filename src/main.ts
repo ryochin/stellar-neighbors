@@ -17,11 +17,11 @@ const RENDER_KEYS: readonly (keyof AppState)[] = [
   "stars",
   "observer",
   "selected",
-  "coordMode",
   "unitMode",
   "labelMode",
   "showGrid",
   "showGalacticPlane",
+  "showCelestialEquator",
   "maxRadius",
 ]
 
@@ -40,7 +40,6 @@ const renderer = createCanvas2dRenderer({
 renderer.mount(byId("stage"))
 renderer.update(buildRenderView(store.getState()))
 store.subscribe((state, previous) => {
-  if (state.coordMode !== previous.coordMode) renderer.resetView(state.coordMode)
   if (hasChanged(state, previous, RENDER_KEYS)) renderer.update(buildRenderView(state))
 })
 
@@ -64,7 +63,7 @@ mountDetailPanel(store, actions)
 const search = byId<HTMLInputElement>("search")
 window.addEventListener("keydown", (e) => {
   if (e.key.toLowerCase() === "r" && document.activeElement !== search) {
-    renderer.resetView(store.getState().coordMode)
+    renderer.resetView()
   }
 })
 

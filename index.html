@@ -13,8 +13,8 @@
           <div class="kicker">SOLAR NEIGHBORHOOD · INTERACTIVE ATLAS</div>
           <h1>The Solar Neighborhood<br />in 3D, 100 Light-Years Across</h1>
           <p class="sub">
-            Default: galactic coordinates, a 100 ly cube centered on the Sun<br />Switchable to
-            J2000 equatorial coordinates
+            Galactic coordinates, a 100 ly cube centered on the Sun<br />with an optional celestial
+            equator overlay
           </p>
         </div>
         <div class="statbar">
@@ -80,13 +80,15 @@
         <div class="panel">
           <div class="guide-title">Coordinates and the galactic plane</div>
           <p>
-            By default the XYZ axes follow galactic coordinates: the XY plane is the galactic plane
-            (latitude b = 0°) and the Z axis points to the north galactic pole. Switch to J2000
-            equatorial coordinates to compare the same stars against another reference frame.
+            The XYZ axes follow galactic coordinates: the XY plane is the galactic plane (latitude b
+            = 0°) and the Z axis points to the north galactic pole. Turn on the celestial equator to
+            compare the same stars against the J2000 equator (δ = 0°) and the north celestial pole,
+            which is tilted about 63° from the galactic pole.
           </p>
           <div class="key">
             <span class="gp">Galactic plane</span><span class="gc">Galactic center</span
-            ><span class="gn">North galactic pole</span>
+            ><span class="gn">North galactic pole</span><span class="ce">Celestial equator</span
+            ><span class="cn">North celestial pole</span>
           </div>
         </div>
         <input
@@ -121,20 +123,19 @@
             target="_blank"
             rel="noopener"
             >ESA Gaia DR3</a
-          >. HYG does not cover every star, and star sizes are schematic. Switching coordinates
-          turns the cube, so the set of stars inside it changes.
+          >. HYG does not cover every star, and star sizes are schematic.
         </div>
       </aside>
       <div class="stage" id="stage">
         <div class="stage-top">
           <div class="toolbar">
             <button
-              class="tool active"
-              id="coords"
+              class="tool"
+              id="equator"
               type="button"
-              title="Switch between galactic and equatorial coordinates"
+              title="Show or hide the celestial equator (δ = 0°)"
             >
-              Frame: Galactic
+              Celestial equator: OFF
             </button>
             <button class="tool active" id="units" type="button" title="Switch the distance unit">
               Units: ly

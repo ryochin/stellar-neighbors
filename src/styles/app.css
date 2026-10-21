@@ -504,6 +504,12 @@ canvas {
 .panel .key .gp:before {
   color: #69d3c6;
 }
+.panel .key .ce:before {
+  color: #c9b2ff;
+}
+.panel .key .cn:before {
+  color: #d2bcff;
+}
 @media (max-width: 720px) {
   .app {
     height: auto;

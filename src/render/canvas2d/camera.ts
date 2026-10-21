@@ -1,4 +1,3 @@
-import { galacticPoleIn, type CoordMode } from "../../astro/coordinates"
 import type { Vec3 } from "../../catalog/types"
 
 export interface CameraAngles {
@@ -28,15 +27,13 @@ const PERSPECTIVE_DISTANCE = 240
 // Small enough to keep the axis labels clear of the toolbar and legend on a 1440px screen.
 const DEFAULT_ZOOM = 0.95
 
-export function defaultAngles(mode: CoordMode): CameraAngles {
-  return mode === "gal"
-    ? { yaw: 0.36, pitch: 0.29, zoom: DEFAULT_ZOOM }
-    : { yaw: -0.57, pitch: 0.4, zoom: DEFAULT_ZOOM }
+export function defaultAngles(): CameraAngles {
+  return { yaw: 0.36, pitch: 0.29, zoom: DEFAULT_ZOOM }
 }
 
-export function galacticPoleAngles(mode: CoordMode): CameraAngles {
-  const dir = galacticPoleIn(mode)
-  return { yaw: Math.atan2(dir[0], dir[1]), pitch: Math.asin(dir[2]), zoom: 1.08 }
+// Looking straight down from the north galactic pole (+Z).
+export function galacticPoleAngles(): CameraAngles {
+  return { yaw: 0, pitch: Math.PI / 2, zoom: 1.08 }
 }
 
 export function project(angles: CameraAngles, viewport: Viewport, [x, y, z]: Vec3): Projected {

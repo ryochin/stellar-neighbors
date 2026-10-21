@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest"
-import { GAL_Z } from "../../src/astro/coordinates"
 import type { Vec3 } from "../../src/catalog/types"
 import { defaultAngles, galacticPoleAngles, project } from "../../src/render/canvas2d/camera"
 
@@ -9,7 +8,7 @@ const scale = 800 / 144
 
 describe("project", () => {
   it("maps the origin to the stage anchor point", () => {
-    const p = project(defaultAngles("gal"), viewport, [0, 0, 0])
+    const p = project(defaultAngles(), viewport, [0, 0, 0])
     expect(p.x).toBeCloseTo(510, 9)
     expect(p.y).toBeCloseTo(400, 9)
     expect(p.f).toBe(1)
@@ -24,8 +23,7 @@ describe("project", () => {
   it("keeps the axes right-handed (screen right × up = toward the viewer)", () => {
     for (const angles of [
       { yaw: 0, pitch: 0, zoom: 1 },
-      defaultAngles("gal"),
-      defaultAngles("eq"),
+      defaultAngles(),
       { yaw: -2.1, pitch: -1.2, zoom: 3 },
     ]) {
       // Undo the perspective so each row is the axis in (right, up, toward-viewer) form.
@@ -50,7 +48,7 @@ describe("project", () => {
   })
 
   it("turns galactic longitude counterclockwise when seen from the north galactic pole", () => {
-    const angles = galacticPoleAngles("gal")
+    const angles = galacticPoleAngles()
     const toScreen = (p: Vec3): [number, number] => {
       const q = project(angles, viewport, p)
       return [q.x - 510, 400 - q.y]
@@ -71,15 +69,9 @@ describe("project", () => {
 })
 
 describe("galacticPoleAngles", () => {
-  it("looks straight down the z axis in galactic mode", () => {
-    const angles = galacticPoleAngles("gal")
+  it("looks straight down the z axis", () => {
+    const angles = galacticPoleAngles()
     expect(angles.pitch).toBeCloseTo(Math.PI / 2, 9)
     expect(angles.zoom).toBe(1.08)
-  })
-
-  it("follows the galactic pole direction in equatorial mode", () => {
-    const angles = galacticPoleAngles("eq")
-    expect(angles.yaw).toBeCloseTo(Math.atan2(GAL_Z[0], GAL_Z[1]), 9)
-    expect(angles.pitch).toBeCloseTo(Math.asin(GAL_Z[2]), 9)
   })
 })

@@ -1,22 +1,10 @@
-import type { CoordMode } from "../astro/coordinates"
 import { UNITS } from "../astro/units"
 import type { StarRenderer } from "../render/renderer"
 import { hasChanged, type AppActions, type AppState, type LabelMode } from "../state/app-state"
 import type { Store } from "../state/store"
 import { byId, escapeHtml } from "./dom"
 
-const COORD_MODES: Record<CoordMode, { label: string; legend: string; hint: string }> = {
-  gal: {
-    label: "Galactic",
-    legend: "GALACTIC COORDINATES",
-    hint: "X: galactic center (l = 0°) · Y: l = 90° · Z: north galactic pole (b = +90°)",
-  },
-  eq: {
-    label: "Equatorial",
-    legend: "J2000 EQUATORIAL",
-    hint: "X: vernal equinox (RA 0h) · Y: RA 6h · Z: north celestial pole",
-  },
-}
+const AXIS_HINT = "X: galactic center (l = 0°) · Y: l = 90° · Z: north galactic pole (b = +90°)"
 
 const LABEL_TEXT: Record<LabelMode, string> = {
   major: "Labels: Major",
@@ -25,11 +13,11 @@ const LABEL_TEXT: Record<LabelMode, string> = {
 }
 
 const KEYS = [
-  "coordMode",
   "unitMode",
   "labelMode",
   "showGrid",
   "showGalacticPlane",
+  "showCelestialEquator",
   "observer",
 ] as const
 
@@ -38,7 +26,7 @@ export function mountToolbar(
   actions: AppActions,
   camera: Pick<StarRenderer, "resetView" | "lookFromGalacticPole">,
 ): void {
-  const coords = byId("coords")
+  const equator = byId("equator")
   const units = byId("units")
   const labels = byId("labels")
   const grid = byId("grid")
@@ -46,18 +34,18 @@ export function mountToolbar(
   const legend = byId("legend")
   const hint = byId("hint")
 
-  coords.addEventListener("click", () => actions.toggleCoordMode())
+  equator.addEventListener("click", () => actions.toggleCelestialEquator())
   units.addEventListener("click", () => actions.cycleUnitMode())
   labels.addEventListener("click", () => actions.cycleLabelMode())
   grid.addEventListener("click", () => actions.toggleGrid())
   galactic.addEventListener("click", () => actions.toggleGalacticPlane())
   byId("galview").addEventListener("click", () => camera.lookFromGalacticPole())
-  byId("reset").addEventListener("click", () => camera.resetView(store.getState().coordMode))
+  byId("reset").addEventListener("click", () => camera.resetView())
 
   const render = (state: AppState): void => {
-    const mode = COORD_MODES[state.coordMode]
     const { label: unit, name: unitName } = UNITS[state.unitMode]
-    coords.textContent = `Frame: ${mode.label}`
+    equator.textContent = `Celestial equator: ${state.showCelestialEquator ? "ON" : "OFF"}`
+    equator.classList.toggle("active", state.showCelestialEquator)
     units.textContent = `Units: ${unit}`
     units.title = `Switch the distance unit (now: ${unitName})`
     labels.textContent = LABEL_TEXT[state.labelMode]
@@ -65,8 +53,11 @@ export function mountToolbar(
     grid.classList.toggle("active", state.showGrid)
     galactic.textContent = `Galactic plane: ${state.showGalacticPlane ? "ON" : "OFF"}`
     galactic.classList.toggle("active", state.showGalacticPlane)
-    legend.innerHTML = `${mode.legend} · <span style="color:#56dfea">● ${escapeHtml(state.observer.name)}</span> · <span style="color:#80d9ce">▱ GALACTIC PLANE (b=0°)</span> · UNITS: ${unit}`
-    hint.innerHTML = `${mode.hint}<br>Galactic plane: b = 0° / Galactic center: l = 0° / Distances in ${unit}`
+    const equatorLegend = state.showCelestialEquator
+      ? ` · <span style="color:#c9b2ff">▱ CELESTIAL EQUATOR (δ=0°)</span>`
+      : ""
+    legend.innerHTML = `GALACTIC COORDINATES · <span style="color:#56dfea">● ${escapeHtml(state.observer.name)}</span> · <span style="color:#80d9ce">▱ GALACTIC PLANE (b=0°)</span>${equatorLegend} · UNITS: ${unit}`
+    hint.innerHTML = `${AXIS_HINT}<br>Galactic plane: b = 0° / Galactic center: l = 0° / Distances in ${unit}`
   }
   render(store.getState())
   store.subscribe((state, previous) => {

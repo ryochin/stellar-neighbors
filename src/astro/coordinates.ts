@@ -5,8 +5,6 @@ export const GAL_X: Vec3 = [-0.0548755604162154, -0.873437090234885, -0.48383501
 export const GAL_Y: Vec3 = [0.4941094278755837, -0.4448296299600112, 0.746982244497219]
 export const GAL_Z: Vec3 = [-0.8676661490190047, -0.1980763734312015, 0.4559837761750669]
 
-export type CoordMode = "gal" | "eq"
-
 export const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
 export const toDegrees = (radians: number): number => (radians * 180) / Math.PI
 export const dot = (a: Vec3, b: Vec3): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
@@ -41,14 +39,12 @@ export function galacticAngles(g: Vec3): { l: number; b: number } | null {
   return { l, b }
 }
 
-/** Vector at galactic longitude/latitude and length `r`, expressed in the frame of `mode`. */
-export function galacticVectorIn(mode: CoordMode, lDeg: number, r: number, bDeg = 0): Vec3 {
+/** Vector at galactic longitude/latitude and length `r`, in galactic coordinates. */
+export function galacticVector(lDeg: number, r: number, bDeg = 0): Vec3 {
   const l = toRadians(lDeg)
   const b = toRadians(bDeg)
-  const g: Vec3 = [r * Math.cos(b) * Math.cos(l), r * Math.cos(b) * Math.sin(l), r * Math.sin(b)]
-  return mode === "gal" ? g : galacticToEquatorial(g)
+  return [r * Math.cos(b) * Math.cos(l), r * Math.cos(b) * Math.sin(l), r * Math.sin(b)]
 }
 
-export function galacticPoleIn(mode: CoordMode): Vec3 {
-  return mode === "gal" ? [0, 0, 1] : GAL_Z
-}
+/** North celestial pole (J2000) as a unit vector in galactic coordinates. */
+export const NORTH_CELESTIAL_POLE: Vec3 = equatorialToGalactic([0, 0, 1])

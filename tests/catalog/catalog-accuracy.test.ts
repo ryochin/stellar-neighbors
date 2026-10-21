@@ -62,7 +62,7 @@ describe("shipped catalog against SIMBAD", () => {
 
 describe("top-down view against SIMBAD", () => {
   const viewport = { width: 1000, height: 800 }
-  const angles = galacticPoleAngles("gal")
+  const angles = galacticPoleAngles()
   const origin = project(angles, viewport, [0, 0, 0])
   // min(1000 / 140, 800 / 144) * zoom
   const scale = (800 / 144) * angles.zoom

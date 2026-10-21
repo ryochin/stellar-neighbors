@@ -4,15 +4,7 @@ import { getActiveStars, hasChanged, type AppActions, type AppState } from "../s
 import type { Store } from "../state/store"
 import { byId } from "./dom"
 
-const KEYS = [
-  "stars",
-  "observer",
-  "coordMode",
-  "unitMode",
-  "maxRadius",
-  "loadStatus",
-  "catalogMeta",
-] as const
+const KEYS = ["stars", "observer", "unitMode", "maxRadius", "loadStatus", "catalogMeta"] as const
 
 export function mountDataPanel(
   store: Store<AppState>,

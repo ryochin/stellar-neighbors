@@ -1,4 +1,3 @@
-import type { CoordMode } from "../astro/coordinates"
 import { nextUnitMode, type UnitMode } from "../astro/units"
 import { DEFAULT_MAX_RADIUS_LY, canObserveFrom, selectActiveStars } from "../astro/visibility"
 import { rowToStar } from "../catalog/loader"
@@ -17,12 +16,12 @@ export interface AppState {
   stars: Star[]
   observer: Star
   selected: Star | null
-  coordMode: CoordMode
   unitMode: UnitMode
   maxRadius: number
   labelMode: LabelMode
   showGrid: boolean
   showGalacticPlane: boolean
+  showCelestialEquator: boolean
   searchQuery: string
   catalogMeta: CatalogMeta | null
   loadStatus: LoadStatus
@@ -37,12 +36,12 @@ export function createInitialState(): AppState {
     stars: [sun],
     observer: sun,
     selected: sun,
-    coordMode: "gal",
     unitMode: "ly",
     maxRadius: DEFAULT_MAX_RADIUS_LY,
     labelMode: "major",
     showGrid: true,
     showGalacticPlane: true,
+    showCelestialEquator: false,
     searchQuery: "",
     catalogMeta: null,
     loadStatus: LOADING_STATUS,
@@ -52,24 +51,22 @@ export function createInitialState(): AppState {
 let activeCache: {
   stars: Star[]
   observer: Star
-  coordMode: CoordMode
   maxRadius: number
   value: Star[]
 } | null = null
 
 export function getActiveStars(state: AppState): Star[] {
-  const { stars, observer, coordMode, maxRadius } = state
+  const { stars, observer, maxRadius } = state
   if (
     activeCache &&
     activeCache.stars === stars &&
     activeCache.observer === observer &&
-    activeCache.coordMode === coordMode &&
     activeCache.maxRadius === maxRadius
   ) {
     return activeCache.value
   }
-  const value = selectActiveStars(stars, observer, coordMode, maxRadius)
-  activeCache = { stars, observer, coordMode, maxRadius, value }
+  const value = selectActiveStars(stars, observer, maxRadius)
+  activeCache = { stars, observer, maxRadius, value }
   return value
 }
 
@@ -133,8 +130,6 @@ export function createActions(store: Store<AppState>) {
       const sun = findSun(store.getState().stars)
       if (sun) observeStar(sun)
     },
-    toggleCoordMode: (): void =>
-      commit((s) => ({ coordMode: s.coordMode === "gal" ? "eq" : "gal" })),
     cycleUnitMode: (): void => store.setState((s) => ({ unitMode: nextUnitMode(s.unitMode) })),
     cycleLabelMode: (): void =>
       store.setState((s) => ({
@@ -143,6 +138,8 @@ export function createActions(store: Store<AppState>) {
     toggleGrid: (): void => store.setState((s) => ({ showGrid: !s.showGrid })),
     toggleGalacticPlane: (): void =>
       store.setState((s) => ({ showGalacticPlane: !s.showGalacticPlane })),
+    toggleCelestialEquator: (): void =>
+      store.setState((s) => ({ showCelestialEquator: !s.showCelestialEquator })),
     setMaxRadius: (maxRadius: number): void => commit(() => ({ maxRadius })),
     setSearchQuery: (searchQuery: string): void => store.setState({ searchQuery }),
   }
