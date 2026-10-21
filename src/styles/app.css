@@ -357,16 +357,28 @@ canvas {
   width: 100%;
   height: 100%;
 }
-.toolbar {
+/* Toolbar and legend share one row so the legend can never run under the buttons.
+   row-reverse keeps the toolbar on the right and wraps the legend below it when space runs out. */
+.stage-top {
   position: absolute;
   top: 20px;
+  left: 25px;
   right: 20px;
+  z-index: 1;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 24px;
+  pointer-events: none;
+}
+.toolbar {
   display: flex;
   gap: 7px;
-  z-index: 1;
   flex-wrap: wrap;
   justify-content: flex-end;
-  max-width: min(78vw, 650px);
+  max-width: min(78%, 650px);
+  pointer-events: auto;
 }
 .tool {
   background: #101e30dd;
@@ -408,14 +420,12 @@ canvas {
   max-width: 40vw;
 }
 .legend {
-  position: absolute;
-  left: 25px;
-  top: 23px;
+  flex: 1 1 260px;
+  min-width: 0;
+  margin-top: 3px;
   color: #9ec4dc;
   font-size: 11px;
-  pointer-events: none;
   letter-spacing: 0.02em;
-  max-width: 55vw;
 }
 .tooltip {
   position: absolute;
@@ -514,18 +524,17 @@ canvas {
     padding: 18px;
     max-height: 650px;
   }
-  .toolbar {
+  .stage-top {
     top: 10px;
+    left: 14px;
     right: 10px;
+  }
+  .toolbar {
     max-width: 82%;
   }
   .tool {
     padding: 6px 8px;
     font-size: 11px;
-  }
-  .legend {
-    top: 12px;
-    left: 14px;
   }
   .instructions {
     bottom: 11px;

@@ -230,7 +230,8 @@ export function buildCatalogRows(
 
   const rows = records.map((record): CatalogRow => {
     const star = overrides.get(record.id)
-    const label = hygCatalogLabel(record)
+    // The Sun has no catalog ID; without this, HYG's Sol row would fall back to "HYG 0".
+    const label = record.distLy === 0 ? "" : hygCatalogLabel(record)
     const name = star?.name ?? (record.proper || label)
     const basePriority = record.proper ? 4 : 0
     return [

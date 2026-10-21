@@ -114,7 +114,7 @@ describe("buildCatalogRows", () => {
 
   it("merges curated names by explicit id, HIP and fuzzy match", () => {
     const { rows, logs } = buildCatalogRows(parseHygCsv(CSV), CURATED)
-    expect(rows[0]).toEqual(["hyg-0", "Sun", "太陽", "HYG 0", 0, 0, 0, "G", -26.7, 9])
+    expect(rows[0]).toEqual(["hyg-0", "Sun", "太陽", "", 0, 0, 0, "G", -26.7, 9])
     expect(rows[1]).toEqual([
       "hyg-32263",
       "Sirius",

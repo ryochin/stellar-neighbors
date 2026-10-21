@@ -125,49 +125,51 @@
         </div>
       </aside>
       <div class="stage" id="stage">
-        <div class="legend" id="legend"></div>
-        <div class="toolbar">
-          <button
-            class="tool active"
-            id="coords"
-            type="button"
-            title="Switch between galactic and equatorial coordinates"
-          >
-            Frame: Galactic
-          </button>
-          <button class="tool active" id="units" type="button" title="Switch the distance unit">
-            Units: ly
-          </button>
-          <button
-            class="tool active"
-            id="labels"
-            type="button"
-            title="Cycle labels: major, all, none"
-          >
-            Labels: Major
-          </button>
-          <button class="tool active" id="grid" type="button" title="Show or hide the grid">
-            Grid
-          </button>
-          <button
-            class="tool active"
-            id="galactic"
-            type="button"
-            title="Show or hide the galactic plane (b = 0°)"
-          >
-            Galactic plane: ON
-          </button>
-          <button
-            class="tool"
-            id="galview"
-            type="button"
-            title="Look down on the galactic plane from the north galactic pole"
-          >
-            ↗ Top-down view
-          </button>
-          <button class="tool" id="reset" type="button" title="Reset the view angle (R)">
-            ↺ Reset view
-          </button>
+        <div class="stage-top">
+          <div class="toolbar">
+            <button
+              class="tool active"
+              id="coords"
+              type="button"
+              title="Switch between galactic and equatorial coordinates"
+            >
+              Frame: Galactic
+            </button>
+            <button class="tool active" id="units" type="button" title="Switch the distance unit">
+              Units: ly
+            </button>
+            <button
+              class="tool active"
+              id="labels"
+              type="button"
+              title="Cycle labels: major, all, none"
+            >
+              Labels: Major
+            </button>
+            <button class="tool active" id="grid" type="button" title="Show or hide the grid">
+              Grid
+            </button>
+            <button
+              class="tool active"
+              id="galactic"
+              type="button"
+              title="Show or hide the galactic plane (b = 0°)"
+            >
+              Galactic plane: ON
+            </button>
+            <button
+              class="tool"
+              id="galview"
+              type="button"
+              title="Look down on the galactic plane from the north galactic pole"
+            >
+              ↗ Top-down view
+            </button>
+            <button class="tool" id="reset" type="button" title="Reset the view angle (R)">
+              ↺ Reset view
+            </button>
+          </div>
+          <div class="legend" id="legend"></div>
         </div>
         <div class="tooltip" id="tooltip"></div>
         <div class="instructions">

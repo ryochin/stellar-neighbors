@@ -1,5 +1,5 @@
-{"version":1,"meta":{"source":"HYG v4.1 (commit 3bf37f4)","license":"CC BY-SA 4.0 — David Nash / astronexus HYG Database","generatedAt":"2026-10-20","maxDistanceLy":173.2},"fields":["id","name","nameJa","catalogLabel","distLy","raH","decDeg","spec","mag","priority"],"stars":[
-["hyg-0","Sun","太陽","HYG 0",0,0,0,"G",-26.7,9],
+{"version":1,"meta":{"source":"HYG v4.1 (commit 3bf37f4)","license":"CC BY-SA 4.0 — David Nash / astronexus HYG Database","generatedAt":"2026-10-21","maxDistanceLy":173.2},"fields":["id","name","nameJa","catalogLabel","distLy","raH","decDeg","spec","mag","priority"],"stars":[
+["hyg-0","Sun","太陽","",0,0,0,"G",-26.7,9],
 ["hyg-2","HIP 2","HIP 2","HIP 2",156.43,0.000283,-19.49884,"K",9.27,0],
 ["hyg-18","HIP 18","HIP 18","HIP 18",146.193,0.003522,-4.05368,"K",11.03,0],
 ["hyg-38","HIP 38","HIP 38","HIP 38",137.968,0.007429,-79.06198,"G",8.65,0],
