@@ -1,6 +1,7 @@
 import "./styles/app.css"
+import namesJaUrl from "./catalog/data/names.ja.json?url"
 import catalogUrl from "./catalog/data/stars.json?url"
-import { loadCatalog } from "./catalog/loader"
+import { loadCatalog, loadLocalNames, withLocalNames } from "./catalog/loader"
 import { createCanvas2dRenderer } from "./render/canvas2d/canvas2d-renderer"
 import { buildRenderView } from "./render/renderer"
 import { createActions, createInitialState, hasChanged, type AppState } from "./state/app-state"
@@ -53,8 +54,12 @@ store.subscribe((state, previous) => {
 async function loadStars(): Promise<void> {
   actions.catalogLoading()
   try {
-    const catalog = await loadCatalog(catalogUrl)
-    actions.catalogLoaded(catalog.stars, catalog.meta)
+    // Japanese is the only additional locale until the UI picks one from the browser.
+    const [catalog, names] = await Promise.all([
+      loadCatalog(catalogUrl),
+      loadLocalNames(namesJaUrl, "ja"),
+    ])
+    actions.catalogLoaded(withLocalNames(catalog.stars, names, "ja"), catalog.meta)
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error)
     actions.catalogFailed(`Could not load the star catalog: ${reason}`)

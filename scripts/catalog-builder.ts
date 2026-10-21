@@ -1,12 +1,17 @@
 import { LY_PER_PC } from "../src/astro/units"
 import { MAX_OBSERVER_DISTANCE_LY } from "../src/astro/visibility"
+import { rowToStar } from "../src/catalog/loader"
 import {
   CATALOG_FIELDS,
   CATALOG_VERSION,
+  LOCAL_NAMES_VERSION,
+  isNamesTable,
   type CatalogFile,
   type CatalogMeta,
   type CatalogRow,
+  type LocalNamesFile,
 } from "../src/catalog/types"
+import type { Locale } from "../src/i18n/locales"
 
 // Twice the observer limit: an observer at the limit still has its whole cube populated.
 export const MAX_CATALOG_DISTANCE_LY = MAX_OBSERVER_DISTANCE_LY * 2
@@ -19,6 +24,11 @@ export interface HygRecord {
   gl: string
   hip: string
   hd: string
+  /** Bayer letter as in HYG ("Alp", "Pi-3"). */
+  bayer: string
+  flamsteed: number | null
+  /** IAU constellation abbreviation. */
+  con: string
   raH: number
   decDeg: number
   distLy: number
@@ -28,7 +38,6 @@ export interface HygRecord {
 
 export interface CuratedStar {
   name: string
-  nameJa: string
   distLy: number
   raH: number
   decDeg: number
@@ -105,12 +114,16 @@ export function parseHygCsv(csv: string, maxDistanceLy = MAX_CATALOG_DISTANCE_LY
     if (!Number.isFinite(raH) || !Number.isFinite(decDeg)) continue
     if (raH < 0 || raH > 24 || decDeg < -90 || decDeg > 90) continue
     const mag = parseNumber(get("mag"))
+    const flamsteed = parseNumber(get("flam"))
     records.push({
       id,
       proper: get("proper"),
       gl: get("gl"),
       hip: get("hip"),
       hd: get("hd"),
+      bayer: get("bayer"),
+      flamsteed: Number.isFinite(flamsteed) ? flamsteed : null,
+      con: get("con"),
       raH,
       decDeg,
       distLy,
@@ -199,7 +212,10 @@ export function buildCatalogRows(
       extras.push([
         `curated-${index}`,
         star.name,
-        star.nameJa,
+        "",
+        "",
+        null,
+        "",
         "",
         round(star.distLy, 3),
         round(star.raH, 6),
@@ -232,13 +248,16 @@ export function buildCatalogRows(
     const star = overrides.get(record.id)
     // The Sun has no catalog ID; without this, HYG's Sol row would fall back to "HYG 0".
     const label = record.distLy === 0 ? "" : hygCatalogLabel(record)
-    const name = star?.name ?? (record.proper || label)
+    const designated = record.con !== "" && (record.bayer !== "" || record.flamsteed !== null)
     const basePriority = record.proper ? 4 : 0
     return [
       `hyg-${record.id}`,
-      name,
-      star?.nameJa ?? name,
+      star?.name ?? record.proper,
       label,
+      designated ? record.bayer : "",
+      designated ? record.flamsteed : null,
+      designated ? record.con : "",
+      "",
       round(star?.trustCuratedDistance ? star.distLy : record.distLy, 3),
       round(record.raH, 6),
       round(record.decDeg, 5),
@@ -248,7 +267,57 @@ export function buildCatalogRows(
     ]
   })
 
-  return { rows: [...rows, ...extras], logs }
+  return { rows: assignComponents([...rows, ...extras]), logs }
+}
+
+// Components of a double star share one designation; tell them apart by the letter that
+// ends their Gliese label ("Gl 278A", "Gl 278B"). Stars without one keep the shared name.
+function assignComponents(rows: CatalogRow[]): CatalogRow[] {
+  const keyOf = (row: CatalogRow): string => `${row[3]}|${row[4]}|${row[5]}`
+  const counts = new Map<string, number>()
+  for (const row of rows) {
+    if (row[5]) counts.set(keyOf(row), (counts.get(keyOf(row)) ?? 0) + 1)
+  }
+  return rows.map((row): CatalogRow => {
+    if (!row[5] || (counts.get(keyOf(row)) ?? 0) < 2) return row
+    const component = row[2].match(/[A-Z]$/)?.[0] ?? ""
+    const next: CatalogRow = [...row]
+    next[6] = component
+    return next
+  })
+}
+
+/**
+ * Resolves a hand-written table keyed by English display name ("Tau Ceti") to star ids.
+ * Fails on names that match no star or several, so a typo or a renamed star cannot slip through.
+ */
+export function buildLocalNames(rows: CatalogRow[], table: unknown): Record<string, string> {
+  if (!isNamesTable(table)) throw new Error("Names table must map names to non-empty strings")
+  const idsByName = new Map<string, string[]>()
+  for (const row of rows) {
+    const { id, name } = rowToStar(row)
+    idsByName.set(name, [...(idsByName.get(name) ?? []), id])
+  }
+  const names: Record<string, string> = {}
+  for (const [englishName, localName] of Object.entries(table)) {
+    const ids = idsByName.get(englishName) ?? []
+    if (ids.length !== 1) {
+      throw new Error(`Names table: "${englishName}" matches ${ids.length} stars`)
+    }
+    names[ids[0]] = localName
+  }
+  return names
+}
+
+export function createLocalNamesFile(
+  locale: Locale,
+  names: Record<string, string>,
+): LocalNamesFile {
+  return { version: LOCAL_NAMES_VERSION, locale, names }
+}
+
+export function serializeLocalNames(file: LocalNamesFile): string {
+  return `${JSON.stringify(file, null, 2)}\n`
 }
 
 export function createCatalogFile(rows: CatalogRow[], meta: CatalogMeta): CatalogFile {

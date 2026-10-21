@@ -123,7 +123,7 @@ export function createActions(store: Store<AppState>) {
     setObserver,
     observeStar,
     observeNamed: (name: string): void => {
-      const star = store.getState().stars.find((s) => s.name === name || s.nameJa === name)
+      const star = store.getState().stars.find((s) => s.name === name || s.localName === name)
       if (star) observeStar(star)
     },
     returnToSun: (): void => {

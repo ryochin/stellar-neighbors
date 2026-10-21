@@ -1,5 +1,6 @@
 import { UNITS, formatDistance } from "../astro/units"
 import { observerDistance } from "../astro/visibility"
+import { normalizeSearchText } from "../catalog/search-text"
 import type { Star } from "../catalog/types"
 import { getActiveStars, hasChanged, type AppActions, type AppState } from "../state/app-state"
 import type { Store } from "../state/store"
@@ -67,12 +68,10 @@ export function mountStarList(store: Store<AppState>, actions: AppActions): Star
   }
 
   function render(state: AppState, reveal: boolean): void {
-    const query = state.searchQuery.toLowerCase().trim()
+    const query = normalizeSearchText(state.searchQuery)
     const active = getActiveStars(state)
     const sorted = active
-      .filter((s) =>
-        [s.name, s.nameJa, s.catalogLabel].some((text) => text.toLowerCase().includes(query)),
-      )
+      .filter((s) => s.searchText.includes(query))
       .map((star) => ({ star, distance: observerDistance(star, state.observer) }))
       .sort((a, b) => a.distance - b.distance)
       .map(({ star }) => star)

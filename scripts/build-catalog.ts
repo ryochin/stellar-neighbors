@@ -2,12 +2,16 @@ import { existsSync } from "node:fs"
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../src/i18n/locales"
 import {
   MAX_CATALOG_DISTANCE_LY,
   buildCatalogRows,
+  buildLocalNames,
   createCatalogFile,
+  createLocalNamesFile,
   parseHygCsv,
   serializeCatalog,
+  serializeLocalNames,
   type CuratedStar,
   type HygRecord,
 } from "./catalog-builder"
@@ -20,7 +24,11 @@ const MIN_EXPECTED_STARS = 5000
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const cachePath = resolve(root, "data-src/cache/hygdata_v41.csv")
 const curatedPath = resolve(root, "data-src/curated-stars.json")
-const outputPath = resolve(root, "src/catalog/data/stars.json")
+const outputDir = resolve(root, "src/catalog/data")
+const outputPath = resolve(outputDir, "stars.json")
+// English names live in the catalog itself; every other locale has a hand-written table.
+const namesTablePath = (locale: string): string => resolve(root, `data-src/names/${locale}.json`)
+const namesOutputPath = (locale: string): string => resolve(outputDir, `names.${locale}.json`)
 
 const round1 = (value: number): number => Number(value.toFixed(1))
 
@@ -73,9 +81,19 @@ async function main(): Promise<void> {
     generatedAt: new Date().toISOString().slice(0, 10),
     maxDistanceLy: round1(MAX_CATALOG_DISTANCE_LY),
   })
-  await mkdir(dirname(outputPath), { recursive: true })
+  await mkdir(outputDir, { recursive: true })
   await writeFile(outputPath, serializeCatalog(file))
   console.log(`Wrote ${rows.length} stars to ${outputPath}`)
+
+  for (const locale of SUPPORTED_LOCALES.filter((l) => l !== DEFAULT_LOCALE)) {
+    const table: unknown = JSON.parse(await readFile(namesTablePath(locale), "utf8"))
+    const names = buildLocalNames(rows, table)
+    await writeFile(
+      namesOutputPath(locale),
+      serializeLocalNames(createLocalNamesFile(locale, names)),
+    )
+    console.log(`Wrote ${Object.keys(names).length} ${locale} names to ${namesOutputPath(locale)}`)
+  }
 }
 
 main().catch((error: unknown) => {

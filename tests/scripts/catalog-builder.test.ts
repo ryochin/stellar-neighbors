@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   buildCatalogRows,
+  buildLocalNames,
   createCatalogFile,
   parseCsvLine,
   parseHygCsv,
@@ -9,18 +10,17 @@ import {
 } from "../../scripts/catalog-builder"
 
 const CSV = [
-  '"id","hip","hd","hr","gl","bf","proper","ra","dec","dist","mag","spect"',
-  '0,,,,"","",Sol,0.0,0.0,0.0,-26.7,G2V',
-  '32263,32349,48915,2491,"Gl 244A","9Alp CMa",Sirius,6.752481,-16.716116,2.6371,-1.44,A0m',
-  '70666,70890,,,"Gl 551","",Proxima Centauri,14.495985,-62.679485,1.3012,11.01,M5Ve',
-  '99,,,,"","","",1.0,10.0,60.0,9.0,K2',
-  '100,,,,"","","",2.0,20.0,100000,9.0,M0',
-  '101,500,,,"","","",3.0,bad,10,9.0,M0',
-  '102,,,,"","","",4.0,5.0,20.0,,DA2',
+  '"id","hip","hd","hr","gl","bf","proper","ra","dec","dist","mag","spect","bayer","flam","con"',
+  '0,,,,"","",Sol,0.0,0.0,0.0,-26.7,G2V,,,',
+  '32263,32349,48915,2491,"Gl 244A","9Alp CMa",Sirius,6.752481,-16.716116,2.6371,-1.44,A0m,Alp,9,CMa',
+  '70666,70890,,,"Gl 551","",Proxima Centauri,14.495985,-62.679485,1.3012,11.01,M5Ve,,,Cen',
+  '99,,,,"","","",1.0,10.0,60.0,9.0,K2,,,',
+  '100,,,,"","","",2.0,20.0,100000,9.0,M0,,,',
+  '101,500,,,"","","",3.0,bad,10,9.0,M0,,,',
+  '102,,,,"","","",4.0,5.0,20.0,,DA2,,,',
 ].join("\n")
 
 const curated = (overrides: Partial<CuratedStar> & Pick<CuratedStar, "name">): CuratedStar => ({
-  nameJa: overrides.name,
   distLy: 0,
   raH: 0,
   decDeg: 0,
@@ -30,17 +30,15 @@ const curated = (overrides: Partial<CuratedStar> & Pick<CuratedStar, "name">): C
 })
 
 const CURATED: CuratedStar[] = [
-  curated({ name: "Sun", nameJa: "太陽", priority: 9, hyg: "0" }),
+  curated({ name: "Sun", priority: 9, hyg: "0" }),
   curated({
     name: "Sirius",
-    nameJa: "シリウス",
     distLy: 8.6,
     priority: 9,
     hip: "32349",
   }),
   curated({
     name: "Proxima Centauri",
-    nameJa: "プロキシマ・ケンタウリ",
     distLy: 4.24,
     raH: 14.495985,
     decDeg: -62.679485,
@@ -48,7 +46,6 @@ const CURATED: CuratedStar[] = [
   }),
   curated({
     name: "Imaginary",
-    nameJa: "架空星",
     distLy: 30,
     raH: 10,
     decDeg: 10,
@@ -102,7 +99,7 @@ describe("buildCatalogRows", () => {
       "4,4,4,5,dK6",
     ].join("\n")
     const { rows } = buildCatalogRows(parseHygCsv(csv), [])
-    expect(rows.map((row) => row[7])).toEqual(["D", "M", "M", "K"])
+    expect(rows.map((row) => row[10])).toEqual(["D", "M", "M", "K"])
   })
 
   it("fuzzy-matches across the 0h/24h RA boundary", () => {
@@ -114,12 +111,15 @@ describe("buildCatalogRows", () => {
 
   it("merges curated names by explicit id, HIP and fuzzy match", () => {
     const { rows, logs } = buildCatalogRows(parseHygCsv(CSV), CURATED)
-    expect(rows[0]).toEqual(["hyg-0", "Sun", "太陽", "", 0, 0, 0, "G", -26.7, 9])
+    expect(rows[0]).toEqual(["hyg-0", "Sun", "", "", null, "", "", 0, 0, 0, "G", -26.7, 9])
     expect(rows[1]).toEqual([
       "hyg-32263",
       "Sirius",
-      "シリウス",
       "Gl 244A",
+      "Alp",
+      9,
+      "CMa",
+      "",
       8.601,
       6.752481,
       -16.71612,
@@ -127,10 +127,11 @@ describe("buildCatalogRows", () => {
       -1.44,
       9,
     ])
-    expect(rows[2]?.[2]).toBe("プロキシマ・ケンタウリ")
-    expect(rows[3]?.slice(0, 4)).toEqual(["hyg-102", "HYG 102", "HYG 102", "HYG 102"])
-    expect(rows[3]?.[7]).toBe("D")
-    expect(rows[4]?.slice(0, 4)).toEqual(["curated-3", "Imaginary", "架空星", ""])
+    // A constellation without a Bayer letter or Flamsteed number is no designation.
+    expect(rows[2]?.slice(1, 7)).toEqual(["Proxima Centauri", "Gl 551", "", null, "", ""])
+    expect(rows[3]?.slice(0, 3)).toEqual(["hyg-102", "", "HYG 102"])
+    expect(rows[3]?.[10]).toBe("D")
+    expect(rows[4]?.slice(0, 7)).toEqual(["curated-3", "Imaginary", "", "", null, "", ""])
     expect(logs.map((log) => log.method)).toEqual(["hyg", "hip", "fuzzy", "none"])
   })
 
@@ -154,7 +155,8 @@ describe("buildCatalogRows", () => {
       }),
     ]
     const { rows } = buildCatalogRows(parseHygCsv(CSV), fixed)
-    expect(rows[1]?.slice(0, 6)).toEqual(["hyg-32263", "Sirius", "Sirius", "Gl 244A", 30, 6.752481])
+    expect(rows[1]?.slice(0, 3)).toEqual(["hyg-32263", "Sirius", "Gl 244A"])
+    expect(rows[1]?.[7]).toBe(30)
   })
 
   it("fails when two curated stars claim the same HYG record", () => {
@@ -163,6 +165,63 @@ describe("buildCatalogRows", () => {
       curated({ name: "Sirius again", distLy: 8.6, hip: "32349" }),
     ]
     expect(() => buildCatalogRows(parseHygCsv(CSV), dup)).toThrow(/already matched/)
+  })
+})
+
+describe("double stars", () => {
+  const csv = [
+    '"id","gl","ra","dec","dist","bayer","flam","con"',
+    '1,"Gl 278A",7.5,31.9,15,Alp,66,Gem',
+    '2,"Gl 278B",7.5,31.9,15,Alp,66,Gem',
+    "3,,1.0,1.0,20,,77,Psc",
+    "4,,1.0,1.0,20,,77,Psc",
+    "5,,2.0,2.0,20,Bet,,Psc",
+  ].join("\n")
+
+  it("tells components apart by the letter ending their Gliese label", () => {
+    const { rows } = buildCatalogRows(parseHygCsv(csv), [])
+    expect(rows.map((row) => row[6])).toEqual(["A", "B", "", "", ""])
+  })
+})
+
+describe("buildLocalNames", () => {
+  const { rows } = buildCatalogRows(parseHygCsv(CSV), CURATED)
+
+  it("keys a table by English display name, including designations", () => {
+    const names = buildLocalNames(rows, { Sirius: "シリウス", "HYG 102": "テスト星" })
+    expect(names).toEqual({ "hyg-32263": "シリウス", "hyg-102": "テスト星" })
+  })
+
+  it("accepts designation names built from the Bayer letter or the Flamsteed number", () => {
+    const csv = [
+      '"id","gl","ra","dec","dist","bayer","flam","con"',
+      '1,"Gl 178",4.8,7.0,8,Pi-3,1,Ori',
+      '2,"Gl 820A",21.1,38.7,3.5,,61,Cyg',
+      '3,"Gl 820B",21.1,38.7,3.5,,61,Cyg',
+    ].join("\n")
+    const doubles = buildCatalogRows(parseHygCsv(csv), []).rows
+    const table = { "Pi3 Orionis": "オリオン座π3星", "61 Cygni B": "はくちょう座61番星B" }
+    expect(buildLocalNames(doubles, table)).toEqual({
+      "hyg-1": "オリオン座π3星",
+      "hyg-3": "はくちょう座61番星B",
+    })
+  })
+
+  it("rejects empty or non-string names", () => {
+    expect(() => buildLocalNames(rows, { Sirius: "" })).toThrow(/non-empty/)
+    expect(() => buildLocalNames(rows, { Sirius: 1 })).toThrow(/non-empty/)
+  })
+
+  it("fails on a name that matches no star", () => {
+    expect(() => buildLocalNames(rows, { Sirus: "シリウス" })).toThrow(/Sirus/)
+  })
+
+  it("fails on a name shared by several stars", () => {
+    const twins = buildCatalogRows(
+      parseHygCsv(['"id","ra","dec","dist","proper"', "1,1,1,5,Twin", "2,2,2,5,Twin"].join("\n")),
+      [],
+    ).rows
+    expect(() => buildLocalNames(twins, { Twin: "双子" })).toThrow(/2 stars/)
   })
 })
 

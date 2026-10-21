@@ -5,8 +5,10 @@ export function makeStar(id: string, eq: Vec3, overrides: Partial<Star> = {}): S
   return {
     id,
     name: id,
-    nameJa: id,
+    localName: null,
     catalogLabel: "",
+    designation: null,
+    searchText: id,
     distLy: Math.hypot(...eq),
     raH: 0,
     decDeg: 0,

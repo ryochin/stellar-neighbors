@@ -16,9 +16,9 @@ const META: CatalogMeta = {
   generatedAt: "",
   maxDistanceLy: 173.2,
 }
-const sun = makeStarFromGal("sun", [0, 0, 0], { name: "Sun", nameJa: "太陽" })
+const sun = makeStarFromGal("sun", [0, 0, 0], { name: "Sun", localName: "太陽" })
 const near = makeStarFromGal("near", [10, 0, 0])
-const mid = makeStarFromGal("mid", [40, 0, 0], { name: "Mid", nameJa: "ミッド" })
+const mid = makeStarFromGal("mid", [40, 0, 0], { name: "Mid", localName: "ミッド" })
 const far = makeStarFromGal("far", [90, 0, 0])
 
 let store: Store<AppState>
@@ -56,7 +56,7 @@ describe("app actions", () => {
     expect(store.getState().selected).toBe(sun)
   })
 
-  it("observes a star by English or Japanese name and returns to the Sun", () => {
+  it("observes a star by English or local name and returns to the Sun", () => {
     actions.observeNamed("Mid")
     expect(store.getState().observer).toBe(mid)
     expect(store.getState().selected).toBe(mid)

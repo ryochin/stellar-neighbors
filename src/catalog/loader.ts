@@ -1,10 +1,17 @@
 import { equatorialToCartesian, equatorialToGalactic, galacticAngles } from "../astro/coordinates"
+import { formatDesignation } from "../i18n/catalog/designation"
+import type { Locale } from "../i18n/locales"
+import { normalizeSearchText } from "./search-text"
 import {
   CATALOG_FIELDS,
   CATALOG_VERSION,
+  LOCAL_NAMES_VERSION,
   type CatalogFile,
   type CatalogMeta,
+  isNamesTable,
   type CatalogRow,
+  type Designation,
+  type LocalNamesFile,
   type Star,
 } from "./types"
 
@@ -25,16 +32,40 @@ export interface Catalog {
   stars: Star[]
 }
 
+type FetchFn = (input: string) => Promise<Response>
+const defaultFetch: FetchFn = (input) => fetch(input)
+
+// HYG writes a Bayer letter with a superscript index as "Pi-3".
+function toDesignation(row: CatalogRow): Designation | null {
+  const [, , , bayer, flamsteed, constellation, component] = row
+  if (!constellation || (!bayer && flamsteed === null)) return null
+  const [letter, index] = bayer.split("-")
+  return {
+    bayer: letter || null,
+    bayerIndex: index ? Number(index) : null,
+    flamsteed,
+    constellation,
+    component,
+  }
+}
+
+const searchTextOf = (star: Pick<Star, "name" | "localName" | "catalogLabel">): string =>
+  normalizeSearchText([star.name, star.localName ?? "", star.catalogLabel].join("\n"))
+
 export function rowToStar(row: CatalogRow): Star {
-  const [id, name, nameJa, catalogLabel, distLy, raH, decDeg, spec, mag, priority] = row
+  const [id, properName, catalogLabel, , , , , distLy, raH, decDeg, spec, mag, priority] = row
+  const designation = toDesignation(row)
+  const name = properName || (designation && formatDesignation(designation, "en")) || catalogLabel
   const eq = equatorialToCartesian(raH, decDeg, distLy)
   const gal = equatorialToGalactic(eq)
   const angles = galacticAngles(gal)
   return {
     id,
     name,
-    nameJa,
+    localName: null,
     catalogLabel,
+    designation,
+    searchText: searchTextOf({ name, localName: null, catalogLabel }),
     distLy,
     raH,
     decDeg,
@@ -63,11 +94,44 @@ export function parseCatalog(json: unknown): Catalog {
   return { meta: file.meta as CatalogMeta, stars: file.stars.map(rowToStar) }
 }
 
-export async function loadCatalog(
-  url: string,
-  fetchFn: (input: string) => Promise<Response> = (input) => fetch(input),
-): Promise<Catalog> {
+async function fetchJson(url: string, fetchFn: FetchFn): Promise<unknown> {
   const response = await fetchFn(url)
-  if (!response.ok) throw new Error(`Failed to fetch catalog (HTTP ${response.status})`)
-  return parseCatalog(await response.json())
+  if (!response.ok) throw new Error(`Failed to fetch ${url} (HTTP ${response.status})`)
+  return response.json()
+}
+
+export async function loadCatalog(url: string, fetchFn: FetchFn = defaultFetch): Promise<Catalog> {
+  return parseCatalog(await fetchJson(url, fetchFn))
+}
+
+export function parseLocalNames(json: unknown, locale: Locale): Map<string, string> {
+  const file = json as Partial<LocalNamesFile> | null
+  if (!file || file.version !== LOCAL_NAMES_VERSION || file.locale !== locale) {
+    throw new Error(`Unsupported names file (version: ${String(file?.version)}, locale: ${locale})`)
+  }
+  if (!isNamesTable(file.names)) throw new Error("Names file has invalid names")
+  return new Map(Object.entries(file.names))
+}
+
+export async function loadLocalNames(
+  url: string,
+  locale: Locale,
+  fetchFn: FetchFn = defaultFetch,
+): Promise<Map<string, string>> {
+  return parseLocalNames(await fetchJson(url, fetchFn), locale)
+}
+
+/** Stars with their names in `locale`: the locale's own table first, then the designation. */
+export function withLocalNames(
+  stars: readonly Star[],
+  names: ReadonlyMap<string, string>,
+  locale: Locale,
+): Star[] {
+  return stars.map((star) => {
+    const localName =
+      names.get(star.id) ??
+      (star.designation && formatDesignation(star.designation, locale)) ??
+      null
+    return { ...star, localName, searchText: searchTextOf({ ...star, localName }) }
+  })
 }

@@ -14,6 +14,6 @@ export function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   return element as T
 }
 
-/** Japanese name when it adds something; most HYG stars just repeat the catalog ID. */
+/** Name in the additional locale when it adds something. */
 export const secondaryName = (star: Star): string | null =>
-  star.nameJa && star.nameJa !== star.name ? star.nameJa : null
+  star.localName && star.localName !== star.name ? star.localName : null

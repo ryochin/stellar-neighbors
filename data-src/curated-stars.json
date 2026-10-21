@@ -1,7 +1,6 @@
 [
   {
     "name": "Sun",
-    "nameJa": "太陽",
     "distLy": 0,
     "raH": 0,
     "decDeg": 0,
@@ -11,7 +10,6 @@
   },
   {
     "name": "Proxima Centauri",
-    "nameJa": "プロキシマ・ケンタウリ",
     "distLy": 4.24,
     "raH": 14.495985,
     "decDeg": -62.679485,
@@ -21,7 +19,6 @@
   },
   {
     "name": "Alpha Centauri A",
-    "nameJa": "アルファ・ケンタウリ A",
     "distLy": 4.37,
     "raH": 14.660765,
     "decDeg": -60.833976,
@@ -31,7 +28,6 @@
   },
   {
     "name": "Barnard's Star",
-    "nameJa": "バーナード星",
     "distLy": 5.96,
     "raH": 17.963472,
     "decDeg": 4.693388,
@@ -41,7 +37,6 @@
   },
   {
     "name": "Wolf 359",
-    "nameJa": "ウルフ359",
     "distLy": 7.86,
     "raH": 10.941,
     "decDeg": 7,
@@ -50,7 +45,6 @@
   },
   {
     "name": "Lalande 21185",
-    "nameJa": "ラランド21185",
     "distLy": 8.31,
     "raH": 11.055632,
     "decDeg": 35.969877,
@@ -59,7 +53,6 @@
   },
   {
     "name": "Sirius",
-    "nameJa": "シリウス",
     "distLy": 8.6,
     "raH": 6.752481,
     "decDeg": -16.716116,
@@ -69,7 +62,6 @@
   },
   {
     "name": "UV Ceti",
-    "nameJa": "UVセティ",
     "distLy": 8.73,
     "raH": 1.65,
     "decDeg": -17.94,
@@ -79,7 +71,6 @@
   },
   {
     "name": "Ross 154",
-    "nameJa": "ロス154",
     "distLy": 9.69,
     "raH": 18.830369,
     "decDeg": -23.836232,
@@ -88,7 +79,6 @@
   },
   {
     "name": "Ross 248",
-    "nameJa": "ロス248",
     "distLy": 10.3,
     "raH": 23.7,
     "decDeg": 44.17,
@@ -97,7 +87,6 @@
   },
   {
     "name": "Epsilon Eridani",
-    "nameJa": "イプシロン・エリダニ",
     "distLy": 10.49,
     "raH": 3.548848,
     "decDeg": -9.458262,
@@ -107,7 +96,6 @@
   },
   {
     "name": "Lacaille 9352",
-    "nameJa": "ラカイユ9352",
     "distLy": 10.69,
     "raH": 23.097531,
     "decDeg": -35.853073,
@@ -116,7 +104,6 @@
   },
   {
     "name": "Ross 128",
-    "nameJa": "ロス128",
     "distLy": 10.95,
     "raH": 11.795666,
     "decDeg": 0.804563,
@@ -125,7 +112,6 @@
   },
   {
     "name": "Procyon",
-    "nameJa": "プロキオン",
     "distLy": 11.46,
     "raH": 7.655033,
     "decDeg": 5.224993,
@@ -135,7 +121,6 @@
   },
   {
     "name": "61 Cygni",
-    "nameJa": "61はくちょう座",
     "distLy": 11.37,
     "raH": 21.114794,
     "decDeg": 38.749415,
@@ -144,7 +129,6 @@
   },
   {
     "name": "Groombridge 34",
-    "nameJa": "グルームブリッジ34",
     "distLy": 11.7,
     "raH": 0.306174,
     "decDeg": 44.022954,
@@ -153,7 +137,6 @@
   },
   {
     "name": "Tau Ceti",
-    "nameJa": "タウ・セティ",
     "distLy": 11.9,
     "raH": 1.735,
     "decDeg": -15.94,
@@ -163,7 +146,6 @@
   },
   {
     "name": "Epsilon Indi",
-    "nameJa": "イプシロン・インディ",
     "distLy": 11.87,
     "raH": 22.055,
     "decDeg": -56.8,
@@ -172,7 +154,6 @@
   },
   {
     "name": "GJ 1061",
-    "nameJa": "GJ 1061",
     "distLy": 11.98,
     "raH": 3.598,
     "decDeg": -44.52,
@@ -183,7 +164,6 @@
   },
   {
     "name": "YZ Ceti",
-    "nameJa": "YZセティ",
     "distLy": 12.1,
     "raH": 1.2,
     "decDeg": -16,
@@ -193,7 +173,6 @@
   },
   {
     "name": "40 Eridani",
-    "nameJa": "40エリダニ座",
     "distLy": 16.3,
     "raH": 4.254,
     "decDeg": -7.65,
@@ -202,7 +181,6 @@
   },
   {
     "name": "70 Ophiuchi",
-    "nameJa": "70へびつかい座",
     "distLy": 16.6,
     "raH": 18.096,
     "decDeg": 2.5,
@@ -212,7 +190,6 @@
   },
   {
     "name": "Altair",
-    "nameJa": "アルタイル",
     "distLy": 16.73,
     "raH": 19.846388,
     "decDeg": 8.868322,
@@ -222,7 +199,6 @@
   },
   {
     "name": "Sigma Draconis",
-    "nameJa": "シグマ・ドラコニス",
     "distLy": 18.8,
     "raH": 19.54,
     "decDeg": 69.66,
@@ -231,7 +207,6 @@
   },
   {
     "name": "Eta Cassiopeiae",
-    "nameJa": "エータ・カシオペヤ座",
     "distLy": 19.4,
     "raH": 0.818,
     "decDeg": 57.81,
@@ -240,7 +215,6 @@
   },
   {
     "name": "36 Ophiuchi",
-    "nameJa": "36へびつかい座",
     "distLy": 19.5,
     "raH": 17.255,
     "decDeg": -26.6,
@@ -250,7 +224,6 @@
   },
   {
     "name": "Delta Pavonis",
-    "nameJa": "デルタ・パボニス",
     "distLy": 19.9,
     "raH": 20.144,
     "decDeg": -66.18,
@@ -259,7 +232,6 @@
   },
   {
     "name": "82 Eridani",
-    "nameJa": "82エリダニ座",
     "distLy": 19.7,
     "raH": 3.333,
     "decDeg": -43,
@@ -268,7 +240,6 @@
   },
   {
     "name": "Gliese 581",
-    "nameJa": "グリーゼ581",
     "distLy": 20.5,
     "raH": 15.323,
     "decDeg": -7.722,
@@ -277,7 +248,6 @@
   },
   {
     "name": "HD 219134",
-    "nameJa": "HD 219134",
     "distLy": 21.25,
     "raH": 23.22,
     "decDeg": 57.17,
@@ -286,7 +256,6 @@
   },
   {
     "name": "Gliese 667",
-    "nameJa": "グリーゼ667",
     "distLy": 23.6,
     "raH": 17.306,
     "decDeg": -34.99,
@@ -296,7 +265,6 @@
   },
   {
     "name": "Beta Hydri",
-    "nameJa": "ベータ・ヒドリ",
     "distLy": 24.3,
     "raH": 0.427,
     "decDeg": -77.26,
@@ -305,7 +273,6 @@
   },
   {
     "name": "Vega",
-    "nameJa": "ベガ",
     "distLy": 25.05,
     "raH": 18.61564,
     "decDeg": 38.783692,
@@ -315,7 +282,6 @@
   },
   {
     "name": "Fomalhaut",
-    "nameJa": "フォーマルハウト",
     "distLy": 25.12,
     "raH": 22.960838,
     "decDeg": -29.622236,
@@ -325,7 +291,6 @@
   },
   {
     "name": "Pi3 Orionis",
-    "nameJa": "パイ3オリオン座",
     "distLy": 26.3,
     "raH": 4.83,
     "decDeg": 6.961,
@@ -334,7 +299,6 @@
   },
   {
     "name": "Mu Herculis",
-    "nameJa": "ミュー・ヘルクレス座",
     "distLy": 27,
     "raH": 17.774,
     "decDeg": 27.72,
@@ -343,7 +307,6 @@
   },
   {
     "name": "Beta Canum Venaticorum",
-    "nameJa": "ベータ・りょうけん座",
     "distLy": 27.4,
     "raH": 12.563,
     "decDeg": 41.356,
@@ -352,7 +315,6 @@
   },
   {
     "name": "Chi Draconis",
-    "nameJa": "カイ・ドラコニス",
     "distLy": 26.3,
     "raH": 18.35,
     "decDeg": 72.7,
@@ -361,7 +323,6 @@
   },
   {
     "name": "Gamma Leporis",
-    "nameJa": "ガンマ・レポリス",
     "distLy": 29.2,
     "raH": 5.741,
     "decDeg": -22.45,
@@ -370,7 +331,6 @@
   },
   {
     "name": "Delta Eridani",
-    "nameJa": "デルタ・エリダニ",
     "distLy": 29.5,
     "raH": 3.72,
     "decDeg": -9.76,
@@ -379,7 +339,6 @@
   },
   {
     "name": "Beta Comae",
-    "nameJa": "ベータ・コマエ",
     "distLy": 29.9,
     "raH": 13.198,
     "decDeg": 27.87,
@@ -388,7 +347,6 @@
   },
   {
     "name": "Kappa1 Ceti",
-    "nameJa": "カッパ1セティ",
     "distLy": 29.8,
     "raH": 3.32,
     "decDeg": 3.37,
@@ -397,7 +355,6 @@
   },
   {
     "name": "Alpha Mensae",
-    "nameJa": "アルファ・メンサエ",
     "distLy": 33.1,
     "raH": 6.17,
     "decDeg": -74.75,
@@ -406,7 +363,6 @@
   },
   {
     "name": "Pollux",
-    "nameJa": "ポルックス",
     "distLy": 33.79,
     "raH": 7.755277,
     "decDeg": 28.026199,
@@ -416,7 +372,6 @@
   },
   {
     "name": "Delta Trianguli",
-    "nameJa": "デルタ・トリアングリ",
     "distLy": 35,
     "raH": 2.285,
     "decDeg": 34.22,
@@ -425,7 +380,6 @@
   },
   {
     "name": "Beta Virginis",
-    "nameJa": "ベータ・ヴィルギニス",
     "distLy": 35.65,
     "raH": 11.846,
     "decDeg": 1.765,
@@ -434,7 +388,6 @@
   },
   {
     "name": "Denebola",
-    "nameJa": "デネボラ",
     "distLy": 35.87,
     "raH": 11.817663,
     "decDeg": 14.57206,
@@ -444,7 +397,6 @@
   },
   {
     "name": "Arcturus",
-    "nameJa": "アークトゥルス",
     "distLy": 36.72,
     "raH": 14.26103,
     "decDeg": 19.18241,
@@ -454,7 +406,6 @@
   },
   {
     "name": "Porrima",
-    "nameJa": "ポリマ",
     "distLy": 38.1,
     "raH": 12.694,
     "decDeg": -1.449,
@@ -463,7 +414,6 @@
   },
   {
     "name": "Lambda Serpentis",
-    "nameJa": "ラムダ・セルペンティス",
     "distLy": 38.3,
     "raH": 15.774,
     "decDeg": 7.35,
@@ -473,7 +423,6 @@
   },
   {
     "name": "Delta Capricorni",
-    "nameJa": "デルタ・カプリコルニ",
     "distLy": 38.7,
     "raH": 21.784,
     "decDeg": -16.127,
@@ -482,7 +431,6 @@
   },
   {
     "name": "Zeta Reticuli 1",
-    "nameJa": "ゼータ・レティクリ1",
     "distLy": 39.5,
     "raH": 3.296,
     "decDeg": -62.575,
@@ -491,7 +439,6 @@
   },
   {
     "name": "TRAPPIST-1",
-    "nameJa": "トラピスト1",
     "distLy": 40.7,
     "raH": 23.104,
     "decDeg": -5.04,
@@ -500,7 +447,6 @@
   },
   {
     "name": "55 Cancri",
-    "nameJa": "55かに座",
     "distLy": 41,
     "raH": 8.877,
     "decDeg": 28.33,
@@ -510,7 +456,6 @@
   },
   {
     "name": "Lambda Aurigae",
-    "nameJa": "ラムダ・ぎょしゃ座",
     "distLy": 41.9,
     "raH": 5.319,
     "decDeg": 40.1,
@@ -520,7 +465,6 @@
   },
   {
     "name": "HD 40307",
-    "nameJa": "HD 40307",
     "distLy": 42,
     "raH": 5.91,
     "decDeg": -60,
@@ -529,7 +473,6 @@
   },
   {
     "name": "Capella",
-    "nameJa": "カペラ",
     "distLy": 42.81,
     "raH": 5.27815,
     "decDeg": 45.997991,
@@ -539,7 +482,6 @@
   },
   {
     "name": "10 Tauri",
-    "nameJa": "10おうし座",
     "distLy": 44.7,
     "raH": 3.614,
     "decDeg": 0.4,
@@ -549,7 +491,6 @@
   },
   {
     "name": "47 Ursae Majoris",
-    "nameJa": "47おおぐま座",
     "distLy": 45.6,
     "raH": 10.99,
     "decDeg": 40.43,
@@ -558,7 +499,6 @@
   },
   {
     "name": "18 Scorpii",
-    "nameJa": "18さそり座",
     "distLy": 45.7,
     "raH": 16.26,
     "decDeg": -8.36,
@@ -567,7 +507,6 @@
   },
   {
     "name": "Alpha Fornacis",
-    "nameJa": "アルファ・フォルナシス",
     "distLy": 46.4,
     "raH": 3.202,
     "decDeg": -28.987,
@@ -576,7 +515,6 @@
   },
   {
     "name": "Gamma Cephei",
-    "nameJa": "ガンマ・ケフェウス座",
     "distLy": 45,
     "raH": 23.656,
     "decDeg": 77.63,
@@ -586,7 +524,6 @@
   },
   {
     "name": "Alderamin",
-    "nameJa": "アルデラミン",
     "distLy": 49,
     "raH": 21.309,
     "decDeg": 62.585,
@@ -595,7 +532,6 @@
   },
   {
     "name": "Tau Boötis",
-    "nameJa": "タウ・ボエティス",
     "distLy": 50.8,
     "raH": 13.788,
     "decDeg": 17.46,
@@ -605,7 +541,6 @@
   },
   {
     "name": "51 Pegasi",
-    "nameJa": "51ペガスス座",
     "distLy": 50.9,
     "raH": 22.957,
     "decDeg": 20.77,
@@ -614,7 +549,6 @@
   },
   {
     "name": "Castor",
-    "nameJa": "カストル",
     "distLy": 51.6,
     "raH": 7.577,
     "decDeg": 31.888,
@@ -624,7 +558,6 @@
   },
   {
     "name": "HD 189733",
-    "nameJa": "HD 189733",
     "distLy": 64.5,
     "raH": 20.003,
     "decDeg": 22.71,
