@@ -35,7 +35,14 @@ const renderer = createCanvas2dRenderer({
     starList.revealSelected()
   },
   onStarHover: (star, x, y) => tooltip.show(star, x, y),
+  onResetRequest: () => resetAll(),
 })
+
+// Back to the start-up view: observe from the Sun, select it and restore the camera.
+function resetAll(): void {
+  actions.returnToSun()
+  renderer.resetView()
+}
 
 renderer.mount(byId("stage"))
 renderer.update(buildRenderView(store.getState()))
@@ -54,7 +61,10 @@ async function loadStars(): Promise<void> {
   }
 }
 
-mountToolbar(store, actions, renderer)
+mountToolbar(store, actions, {
+  resetView: resetAll,
+  lookFromGalacticPole: () => renderer.lookFromGalacticPole(),
+})
 mountObserverBox(store, actions)
 mountDataPanel(store, actions, () => void loadStars())
 const starList = mountStarList(store, actions)
@@ -63,7 +73,7 @@ mountDetailPanel(store, actions)
 const search = byId<HTMLInputElement>("search")
 window.addEventListener("keydown", (e) => {
   if (e.key.toLowerCase() === "r" && document.activeElement !== search) {
-    renderer.resetView()
+    resetAll()
   }
 })
 

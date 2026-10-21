@@ -138,7 +138,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   }
 
   function onDoubleClick(e: MouseEvent): void {
-    if (!isOnControl(e)) resetView()
+    if (!isOnControl(e)) callbacks.onResetRequest()
   }
 
   function resize(): void {

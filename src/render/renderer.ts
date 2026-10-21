@@ -23,6 +23,8 @@ export interface RenderView {
 export interface RendererCallbacks {
   onStarClick(star: Star): void
   onStarHover(star: Star | null, screenX: number, screenY: number): void
+  /** Double-click on the stage; the app decides what a reset covers. */
+  onResetRequest(): void
 }
 
 export interface StarRenderer {
