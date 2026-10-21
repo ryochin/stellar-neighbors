@@ -165,7 +165,7 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
 }
 
 // The galactic plane passes through the Sun, so relative to the observer it shifts along the pole.
-const planeOffset = (view: RenderView): number => -view.observer.gal[2]
+const planeOffset = (view: RenderView): number => -view.origin.gal[2]
 const planeCenter = (view: RenderView): Vec3 => [0, 0, planeOffset(view)]
 
 export function drawGalacticPlane(dc: DrawContext, view: RenderView): void {
@@ -211,7 +211,7 @@ export function drawGalacticPlane(dc: DrawContext, view: RenderView): void {
 }
 
 // The celestial equator also passes through the Sun, so it shifts along its pole like the galactic plane.
-const equatorOffset = (view: RenderView): number => -view.observer.eq[2]
+const equatorOffset = (view: RenderView): number => -view.origin.eq[2]
 const NCP_ARROW = scale(NORTH_CELESTIAL_POLE, 43)
 
 export function drawCelestialEquator(dc: DrawContext, view: RenderView): void {
@@ -274,7 +274,7 @@ export function drawGalacticAnnotations(dc: DrawContext, view: RenderView): void
   if (Math.hypot(n.x - c.x, n.y - c.y) > 28) {
     annotatePoint(dc, pole, "North galactic pole · b=+90°", "#a9c9ff", 10, -26)
   }
-  if (Math.abs(view.observer.gal[2]) <= H) {
+  if (Math.abs(view.origin.gal[2]) <= H) {
     annotatePoint(
       dc,
       add(planeCenter(view), galacticVector(226, 34)),

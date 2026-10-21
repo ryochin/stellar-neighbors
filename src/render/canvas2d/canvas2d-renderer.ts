@@ -1,5 +1,6 @@
 import type { Star } from "../../catalog/types"
-import type { RenderView, RendererCallbacks, StarRenderer } from "../renderer"
+import { transitionView } from "../observer-transition"
+import type { CubeOrigin, RenderView, RendererCallbacks, StarRenderer } from "../renderer"
 import {
   MAX_ZOOM,
   MIN_ZOOM,
@@ -44,8 +45,26 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   let angles: CameraAngles = defaultAngles()
   let viewport = { width: 0, height: 0 }
   let projected: ProjectedStar[] = []
+  // The camera and the observer move animate independently but share one frame loop.
   let animationFrame: number | null = null
-  const drag = { active: false, moved: false, startX: 0, startY: 0, lastX: 0, lastY: 0 }
+  let cameraTransition: { from: CameraAngles; to: CameraAngles; start: number | null } | null = null
+  let observerTransition: {
+    from: CubeOrigin
+    fromStars: Star[]
+    start: number | null
+    // Origin and stars of the latest frame; the other view fields always come from `view`.
+    frame: Pick<RenderView, "origin" | "stars">
+  } | null = null
+  // `previousMoved` remembers the press before this one, so a drag cannot start a double-click.
+  const drag = {
+    active: false,
+    moved: false,
+    previousMoved: false,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+  }
 
   const stageElement = (): HTMLElement => {
     if (!stage) throw new Error("renderer is not mounted")
@@ -54,42 +73,87 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
 
   function draw(): void {
     if (!view || !viewport.width || !viewport.height) return
+    const shown: RenderView = observerTransition ? { ...view, ...observerTransition.frame } : view
     const dc = { ctx, angles, viewport }
     drawBackground(dc)
-    drawCube(dc, view)
-    drawGalacticPlane(dc, view)
-    drawCelestialEquator(dc, view)
-    projected = drawStars(dc, view)
-    drawLabels(dc, view, projected)
-    drawGalacticAnnotations(dc, view)
-    drawCelestialEquatorAnnotations(dc, view)
+    drawCube(dc, shown)
+    drawGalacticPlane(dc, shown)
+    drawCelestialEquator(dc, shown)
+    projected = drawStars(dc, shown)
+    drawLabels(dc, shown, projected)
+    drawGalacticAnnotations(dc, shown)
+    drawCelestialEquatorAnnotations(dc, shown)
+  }
+
+  const prefersReducedMotion = (): boolean =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  const progress = (start: number, now: number): number =>
+    Math.min(1, (now - start) / VIEW_TRANSITION_MS)
+
+  function tick(now: number): void {
+    animationFrame = null
+    if (cameraTransition) {
+      const { from, to } = cameraTransition
+      const t: number = progress((cameraTransition.start ??= now), now)
+      // Land exactly on the target; the shortest-way yaw can differ from it by whole turns.
+      angles = t < 1 ? interpolateAngles(from, to, easeInOutCubic(t)) : to
+      if (t === 1) cameraTransition = null
+    }
+    if (observerTransition && view) {
+      const t: number = progress((observerTransition.start ??= now), now)
+      const { from, fromStars } = observerTransition
+      const { origin, stars } = transitionView(view, from, fromStars, easeInOutCubic(t))
+      observerTransition.frame = { origin, stars }
+      if (t === 1) observerTransition = null
+    }
+    if (cameraTransition || observerTransition) animationFrame = requestAnimationFrame(tick)
+    draw()
+  }
+
+  function requestTick(): void {
+    animationFrame ??= requestAnimationFrame(tick)
   }
 
   function stopAnimation(): void {
-    if (animationFrame === null) return
-    cancelAnimationFrame(animationFrame)
+    if (animationFrame !== null) cancelAnimationFrame(animationFrame)
     animationFrame = null
+    cameraTransition = null
+    observerTransition = null
   }
 
-  // Eases the camera from where it is now to the target; user input stops it midway.
+  // User input takes over the camera; an observer move in progress keeps going.
+  function stopCameraAnimation(): void {
+    cameraTransition = null
+  }
+
+  // Eases the camera from where it is now to the target.
   function animateTo(target: CameraAngles): void {
-    stopAnimation()
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (prefersReducedMotion()) {
+      cameraTransition = null
       angles = target
       draw()
       return
     }
-    const from: CameraAngles = angles
-    let start: number | null = null
-    const step = (now: number): void => {
-      start ??= now
-      const t: number = Math.min(1, (now - start) / VIEW_TRANSITION_MS)
-      // Land exactly on the target; the shortest-way yaw can differ from it by whole turns.
-      angles = t < 1 ? interpolateAngles(from, target, easeInOutCubic(t)) : target
-      animationFrame = t < 1 ? requestAnimationFrame(step) : null
-      draw()
+    cameraTransition = { from: angles, to: target, start: null }
+    requestTick()
+  }
+
+  // Slides the cube from the old observer to the new one; a move in progress continues from where it is.
+  function startObserverTransition(previous: RenderView, next: RenderView): void {
+    const { origin, stars } = observerTransition?.frame ?? previous
+    // The catalog load swaps the placeholder Sun for the real one in the same place: nothing to move.
+    const samePlace = origin.gal.every((v, i) => v === next.origin.gal[i])
+    if (prefersReducedMotion() || samePlace) {
+      observerTransition = null
+      return
     }
-    animationFrame = requestAnimationFrame(step)
+    observerTransition = {
+      from: origin,
+      fromStars: stars.map((s) => s.star),
+      start: null,
+      frame: { origin, stars },
+    }
+    requestTick()
   }
 
   function starAt(x: number, y: number): Star | null {
@@ -114,9 +178,17 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
 
   function onPointerDown(e: PointerEvent): void {
     if (isOnControl(e)) return
-    stopAnimation()
+    stopCameraAnimation()
     const [x, y] = pointerPosition(e)
-    Object.assign(drag, { active: true, moved: false, startX: x, startY: y, lastX: x, lastY: y })
+    Object.assign(drag, {
+      active: true,
+      moved: false,
+      previousMoved: drag.moved,
+      startX: x,
+      startY: y,
+      lastX: x,
+      lastY: y,
+    })
     stageElement().classList.add("dragging")
     stageElement().setPointerCapture(e.pointerId)
     callbacks.onStarHover(null, 0, 0)
@@ -162,7 +234,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
 
   function onWheel(e: WheelEvent): void {
     e.preventDefault()
-    stopAnimation()
+    stopCameraAnimation()
     angles = {
       ...angles,
       zoom: clamp(angles.zoom * Math.exp(-e.deltaY * 0.0011), MIN_ZOOM, MAX_ZOOM),
@@ -171,7 +243,9 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   }
 
   function onDoubleClick(e: MouseEvent): void {
-    if (!isOnControl(e)) callbacks.onResetRequest()
+    if (isOnControl(e) || drag.moved || drag.previousMoved) return
+    const star = starAt(...pointerPosition(e))
+    if (star) callbacks.onStarDoubleClick(star)
   }
 
   function resize(): void {
@@ -206,6 +280,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
       resize()
     },
     update(next) {
+      if (view && next.observer !== view.observer) startObserverTransition(view, next)
       view = next
       draw()
     },

@@ -35,7 +35,7 @@ const renderer = createCanvas2dRenderer({
     starList.revealSelected()
   },
   onStarHover: (star, x, y) => tooltip.show(star, x, y),
-  onResetRequest: () => resetAll(),
+  onStarDoubleClick: (star) => actions.observeStar(star),
 })
 
 // Back to the start-up view: observe from the Sun, select it and restore the camera.

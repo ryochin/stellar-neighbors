@@ -28,10 +28,18 @@ export function mountStarList(store: Store<AppState>, actions: AppActions): Star
   const sortLabel = byId("distanceSortLabel")
 
   search.addEventListener("input", () => actions.setSearchQuery(search.value))
+  // The first click re-renders the rows and scrolls the selection to the middle, so no dblclick
+  // fires and the second click may land on another row: observe the star of the first click.
+  let firstClickStar: Star | undefined
   list.addEventListener("click", (e) => {
+    if (e.detail === 2) {
+      if (firstClickStar) actions.observeStar(firstClickStar)
+      return
+    }
+    if (e.detail > 2) return
     const button = (e.target as Element).closest<HTMLElement>(".entry")
-    if (!button) return
-    const star = store.getState().stars.find((s) => s.id === button.dataset.id)
+    const star = button ? store.getState().stars.find((s) => s.id === button.dataset.id) : undefined
+    firstClickStar = star
     if (star) actions.selectStar(star)
   })
 
