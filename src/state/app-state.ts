@@ -7,10 +7,8 @@ import type { Store } from "./store"
 
 export type LabelMode = "major" | "all" | "none"
 
-export interface LoadStatus {
-  kind: "loading" | "ready" | "error"
-  message: string
-}
+// The UI words the status in its locale; `reason` is the developer-facing error message.
+export type LoadStatus = { kind: "loading" } | { kind: "ready" } | { kind: "error"; reason: string }
 
 export interface AppState {
   stars: Star[]
@@ -28,10 +26,10 @@ export interface AppState {
 }
 
 const LABEL_ORDER: LabelMode[] = ["major", "all", "none"]
-const LOADING_STATUS: LoadStatus = { kind: "loading", message: "Loading star catalog…" }
+const LOADING_STATUS: LoadStatus = { kind: "loading" }
 
-export function createInitialState(): AppState {
-  const sun = rowToStar(SUN_ROW)
+/** `sun` is the placeholder observer until the catalog loads; main.ts names it in the UI locale. */
+export function createInitialState(sun: Star = rowToStar(SUN_ROW)): AppState {
   return {
     stars: [sun],
     observer: sun,
@@ -106,8 +104,8 @@ export function createActions(store: Store<AppState>) {
 
   return {
     catalogLoading: (): void => store.setState({ loadStatus: LOADING_STATUS }),
-    catalogFailed: (message: string): void =>
-      store.setState({ loadStatus: { kind: "error", message } }),
+    catalogFailed: (reason: string): void =>
+      store.setState({ loadStatus: { kind: "error", reason } }),
     catalogLoaded: (stars: Star[], meta: CatalogMeta): void => {
       const observer = findSun(stars) ?? stars[0]
       commit(() => ({
@@ -116,7 +114,7 @@ export function createActions(store: Store<AppState>) {
         selected: observer,
         catalogMeta: meta,
         maxRadius: DEFAULT_MAX_RADIUS_LY,
-        loadStatus: { kind: "ready", message: "" },
+        loadStatus: { kind: "ready" },
       }))
     },
     selectStar: (star: Star): void => store.setState({ selected: star }),

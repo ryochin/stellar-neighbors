@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest"
-import { formatAxisValue, formatDistance, nextUnitMode } from "../../src/astro/units"
+import { convertDistance, formatAxisValue, nextUnitMode } from "../../src/astro/units"
 
 describe("units", () => {
-  it("formats distances with unit-dependent precision", () => {
-    expect(formatDistance(8.6, "ly")).toBe("8.60 ly")
-    expect(formatDistance(100, "ly")).toBe("100 ly")
-    expect(formatDistance(100, "pc")).toBe("30.7 pc")
-    expect(formatDistance(100, "mau")).toBe("6.32 MAU")
-    expect(formatDistance(0, "mau")).toBe("0 MAU")
+  it("converts distances with unit-dependent precision", () => {
+    expect(convertDistance(8.6, "ly")).toEqual({ value: 8.6, digits: 2 })
+    expect(convertDistance(100, "ly")).toEqual({ value: 100, digits: 0 })
+    expect(convertDistance(100, "pc").digits).toBe(1)
+    expect(convertDistance(100, "mau").digits).toBe(2)
+    expect(convertDistance(0, "mau")).toEqual({ value: 0, digits: 0 })
   })
 
   it("formats axis tick values compactly", () => {

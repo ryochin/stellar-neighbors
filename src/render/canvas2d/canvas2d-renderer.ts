@@ -1,4 +1,5 @@
 import type { Star } from "../../catalog/types"
+import type { I18n } from "../../i18n/i18n"
 import { transitionView } from "../observer-transition"
 import type { CubeOrigin, RenderView, RendererCallbacks, StarRenderer } from "../renderer"
 import {
@@ -34,9 +35,9 @@ function getContext2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   return ctx
 }
 
-export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRenderer {
+export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n): StarRenderer {
   const canvas = document.createElement("canvas")
-  canvas.setAttribute("aria-label", "3D map of nearby stars, drag to rotate")
+  canvas.setAttribute("aria-label", i18n.t.canvas.ariaLabel)
   const ctx = getContext2d(canvas)
 
   let stage: HTMLElement | null = null
@@ -74,7 +75,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks): StarRender
   function draw(): void {
     if (!view || !viewport.width || !viewport.height) return
     const shown: RenderView = observerTransition ? { ...view, ...observerTransition.frame } : view
-    const dc = { ctx, angles, viewport }
+    const dc = { ctx, angles, viewport, i18n }
     drawBackground(dc)
     drawCube(dc, shown)
     drawGalacticPlane(dc, shown)

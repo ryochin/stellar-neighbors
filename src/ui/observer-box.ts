@@ -1,3 +1,4 @@
+import { displayName } from "../catalog/display-name"
 import { hasChanged, type AppActions, type AppState } from "../state/app-state"
 import type { Store } from "../state/store"
 import { byId } from "./dom"
@@ -10,7 +11,7 @@ export function mountObserverBox(store: Store<AppState>, actions: AppActions): v
   byId("observeProxima").addEventListener("click", () => actions.observeNamed("Proxima Centauri"))
 
   const render = (state: AppState): void => {
-    name.textContent = state.observer.name
+    name.textContent = displayName(state.observer)
     returnSun.disabled = state.observer.distLy === 0
   }
   render(store.getState())

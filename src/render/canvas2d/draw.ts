@@ -4,9 +4,11 @@ import {
   equatorialToGalactic,
   galacticVector,
 } from "../../astro/coordinates"
-import { UNITS, formatAxisValue } from "../../astro/units"
+import { formatAxisValue } from "../../astro/units"
 import { CUBE_HALF_LY } from "../../astro/visibility"
+import { displayName } from "../../catalog/display-name"
 import type { Vec3 } from "../../catalog/types"
+import type { I18n } from "../../i18n/i18n"
 import { clipPlaneToCube } from "../geometry"
 import type { RenderStar, RenderView } from "../renderer"
 import { project, type CameraAngles, type Projected, type Viewport } from "./camera"
@@ -14,11 +16,15 @@ import { project, type CameraAngles, type Projected, type Viewport } from "./cam
 const TAU = Math.PI * 2
 const MAX_LABELS = 240
 const H = CUBE_HALF_LY
+// The canvas does not inherit the page font, so list the Japanese fonts of app.css as well.
+const FONT_FAMILY =
+  '-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif'
 
 export interface DrawContext {
   ctx: CanvasRenderingContext2D
   angles: CameraAngles
   viewport: Viewport
+  i18n: I18n
 }
 
 export interface ProjectedStar extends Projected {
@@ -107,7 +113,7 @@ export function drawBackground(dc: DrawContext): void {
 
 function drawAxisTicks(dc: DrawContext, view: RenderView): void {
   const { ctx } = dc
-  ctx.font = "10px sans-serif"
+  ctx.font = `10px ${FONT_FAMILY}`
   ctx.textBaseline = "middle"
   ctx.fillStyle = "#aac1d6"
   for (const v of [-H, -H / 2, 0, H / 2, H]) {
@@ -148,18 +154,21 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
     [0, 53, 0],
     [0, 0, 53],
   ]
-  ctx.font = "11px sans-serif"
+  ctx.font = `11px ${FONT_FAMILY}`
   tips.forEach((tip, i) => {
     const q = proj(dc, tip)
     ctx.fillStyle = colors[i]
     ctx.fillText(names[i], q.x - 7, q.y + 4)
   })
-  const unit = UNITS[view.unitMode].label
+  const unit = dc.i18n.t.units[view.unitMode].label
   ctx.fillStyle = "#89a5ba"
   const p1 = proj(dc, [55, -55, -50])
   const p2 = proj(dc, [-55, 55, -50])
   const p3 = proj(dc, [-55, -55, 55])
-  ctx.fillText(`X (${unit})`, p1.x - 18, p1.y + 16)
+  // Right-aligned so a long unit grows away from the cube instead of over the tick labels.
+  ctx.textAlign = "right"
+  ctx.fillText(`X (${unit})`, p1.x + 12, p1.y + 16)
+  ctx.textAlign = "start"
   ctx.fillText(`Y (${unit})`, p2.x - 18, p2.y + 16)
   ctx.fillText(`Z (${unit})`, p3.x - 32, p3.y + 4)
 }
@@ -248,7 +257,7 @@ function annotatePoint(
 ): void {
   const { ctx, viewport } = dc
   const p = proj(dc, point)
-  ctx.font = "600 11px -apple-system,BlinkMacSystemFont,sans-serif"
+  ctx.font = `600 11px ${FONT_FAMILY}`
   const w = ctx.measureText(label).width + 16
   const h = 21
   const x = Math.min(Math.max(5, p.x + dx), viewport.width - w - 5)
@@ -267,18 +276,19 @@ function annotatePoint(
 
 export function drawGalacticAnnotations(dc: DrawContext, view: RenderView): void {
   if (!view.showGalacticPlane) return
-  annotatePoint(dc, galacticVector(0, 45), "Galactic center · l=0°", "#ffd19a", -10, -32)
+  const t = dc.i18n.t.canvas
+  annotatePoint(dc, galacticVector(0, 45), t.galacticCenter, "#ffd19a", -10, -32)
   const pole = galacticVector(0, 43, 90)
   const n = proj(dc, pole)
   const c = proj(dc, [0, 0, 0])
   if (Math.hypot(n.x - c.x, n.y - c.y) > 28) {
-    annotatePoint(dc, pole, "North galactic pole · b=+90°", "#a9c9ff", 10, -26)
+    annotatePoint(dc, pole, t.northGalacticPole, "#a9c9ff", 10, -26)
   }
   if (Math.abs(view.origin.gal[2]) <= H) {
     annotatePoint(
       dc,
       add(planeCenter(view), galacticVector(226, 34)),
-      "Galactic plane · b=0°",
+      t.galacticPlane,
       "#84eadb",
       7,
       12,
@@ -355,12 +365,12 @@ export function drawLabels(dc: DrawContext, view: RenderView, projected: Project
     .sort((a, b) => rank(b) - rank(a))
 
   const boxes: { x: number; y: number; w: number; h: number }[] = []
-  ctx.font = "11px -apple-system,BlinkMacSystemFont,sans-serif"
+  ctx.font = `11px ${FONT_FAMILY}`
   ctx.textBaseline = "middle"
   for (const p of candidates) {
     if (boxes.length >= MAX_LABELS) break
     const star = p.item.star
-    const label = star.name
+    const label = displayName(star)
     const textWidth = ctx.measureText(label).width
     const x = p.x + 10
     const y = p.y - 11
@@ -389,20 +399,14 @@ const EQUATOR_LABEL_DIR = equatorialToGalactic(equatorialToCartesian(18, 0, 34))
 
 export function drawCelestialEquatorAnnotations(dc: DrawContext, view: RenderView): void {
   if (!view.showCelestialEquator) return
+  const t = dc.i18n.t.canvas
   const n = proj(dc, NCP_ARROW)
   const c = proj(dc, [0, 0, 0])
   if (Math.hypot(n.x - c.x, n.y - c.y) > 28) {
-    annotatePoint(
-      dc,
-      NCP_ARROW,
-      "North celestial pole (toward Polaris) · δ=+90°",
-      "#d2bcff",
-      10,
-      -26,
-    )
+    annotatePoint(dc, NCP_ARROW, t.northCelestialPole, "#d2bcff", 10, -26)
   }
   const anchor = add(scale(NORTH_CELESTIAL_POLE, equatorOffset(view)), EQUATOR_LABEL_DIR)
   if (anchor.every((v) => Math.abs(v) <= H)) {
-    annotatePoint(dc, anchor, "Celestial equator · δ=0°", "#c9b2ff", 7, 12)
+    annotatePoint(dc, anchor, t.celestialEquator, "#c9b2ff", 7, 12)
   }
 }

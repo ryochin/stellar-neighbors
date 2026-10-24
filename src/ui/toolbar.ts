@@ -1,16 +1,9 @@
-import { UNITS } from "../astro/units"
+import { displayName } from "../catalog/display-name"
+import type { I18n } from "../i18n/i18n"
 import type { StarRenderer } from "../render/renderer"
-import { hasChanged, type AppActions, type AppState, type LabelMode } from "../state/app-state"
+import { hasChanged, type AppActions, type AppState } from "../state/app-state"
 import type { Store } from "../state/store"
 import { byId, escapeHtml } from "./dom"
-
-const AXIS_HINT = "X: galactic center (l = 0°) · Y: l = 90° · Z: north galactic pole (b = +90°)"
-
-const LABEL_TEXT: Record<LabelMode, string> = {
-  major: "Labels: Major",
-  all: "Labels: All",
-  none: "Labels: None",
-}
 
 const KEYS = [
   "unitMode",
@@ -25,6 +18,7 @@ export function mountToolbar(
   store: Store<AppState>,
   actions: AppActions,
   camera: Pick<StarRenderer, "resetView" | "lookFromGalacticPole">,
+  { t }: I18n,
 ): void {
   const equator = byId("equator")
   const units = byId("units")
@@ -43,21 +37,22 @@ export function mountToolbar(
   byId("reset").addEventListener("click", () => camera.resetView())
 
   const render = (state: AppState): void => {
-    const { label: unit, name: unitName } = UNITS[state.unitMode]
-    equator.textContent = `Celestial equator: ${state.showCelestialEquator ? "ON" : "OFF"}`
+    const { label: unit, name: unitName } = t.units[state.unitMode]
+    const bar = t.toolbar
+    equator.textContent = bar.celestialEquator(state.showCelestialEquator)
     equator.classList.toggle("active", state.showCelestialEquator)
-    units.textContent = `Units: ${unit}`
-    units.title = `Switch the distance unit (now: ${unitName})`
-    labels.textContent = LABEL_TEXT[state.labelMode]
+    units.textContent = bar.units(unit)
+    units.title = bar.unitsTitle(unitName)
+    labels.textContent = bar.labels[state.labelMode]
     labels.classList.toggle("active", state.labelMode !== "none")
     grid.classList.toggle("active", state.showGrid)
-    galactic.textContent = `Galactic plane: ${state.showGalacticPlane ? "ON" : "OFF"}`
+    galactic.textContent = bar.galacticPlane(state.showGalacticPlane)
     galactic.classList.toggle("active", state.showGalacticPlane)
     const equatorLegend = state.showCelestialEquator
-      ? ` · <span style="color:#c9b2ff">▱ CELESTIAL EQUATOR (δ=0°)</span>`
+      ? ` · <span style="color:#c9b2ff">▱ ${bar.legendCelestialEquator}</span>`
       : ""
-    legend.innerHTML = `GALACTIC COORDINATES · <span style="color:#56dfea">● ${escapeHtml(state.observer.name)}</span> · <span style="color:#80d9ce">▱ GALACTIC PLANE (b=0°)</span>${equatorLegend} · UNITS: ${unit}`
-    hint.innerHTML = `${AXIS_HINT}<br>Galactic plane: b = 0° / Galactic center: l = 0° / Distances in ${unit}`
+    legend.innerHTML = `${bar.legendFrame} · <span style="color:#56dfea">● ${escapeHtml(displayName(state.observer))}</span> · <span style="color:#80d9ce">▱ ${bar.legendGalacticPlane}</span>${equatorLegend} · <span style="white-space:nowrap">${bar.legendUnits(unit)}</span>`
+    hint.innerHTML = `${bar.axisHint}<br>${bar.planeHint(unit)}`
   }
   render(store.getState())
   store.subscribe((state, previous) => {

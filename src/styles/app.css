@@ -326,6 +326,7 @@ h1 {
   min-width: 40px;
   cursor: pointer;
 }
+.filter-row span,
 .filter-row output {
   white-space: nowrap;
   color: #e3f4ff;

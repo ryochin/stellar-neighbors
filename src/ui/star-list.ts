@@ -1,7 +1,8 @@
-import { UNITS, formatDistance } from "../astro/units"
 import { observerDistance } from "../astro/visibility"
+import { displayName } from "../catalog/display-name"
 import { normalizeSearchText } from "../catalog/search-text"
 import type { Star } from "../catalog/types"
+import type { I18n } from "../i18n/i18n"
 import { getActiveStars, hasChanged, type AppActions, type AppState } from "../state/app-state"
 import type { Store } from "../state/store"
 import { byId, escapeHtml } from "./dom"
@@ -10,11 +11,14 @@ const LIST_LIMIT = 240
 const KEYS = ["stars", "observer", "selected", "unitMode", "maxRadius", "searchQuery"] as const
 
 // "Selected" is the focused star; "observer" is the coordinate origin. They are independent.
-function renderEntry(star: Star, state: AppState): string {
+function renderEntry(star: Star, state: AppState, i18n: I18n): string {
+  const t = i18n.t.starList
   const isSelected = star === state.selected
   const isObserver = star === state.observer
-  const title = `${star.name}${isSelected ? " (selected)" : ""}${isObserver ? " (observer)" : ""}`
-  return `<button type="button" class="entry${isSelected ? " active" : ""}${isObserver ? " observer-entry" : ""}" data-id="${escapeHtml(star.id)}"${isSelected ? ' aria-current="true"' : ""} title="${escapeHtml(title)}"><span class="dot" style="--c:${star.color}"></span><b>${escapeHtml(star.name)}</b>${isSelected ? '<span class="focus-mark">✦ Selected</span>' : ""}${isObserver ? '<span class="observer-mark">◎</span>' : ""}<small class="distance">${formatDistance(observerDistance(star, state.observer), state.unitMode)}</small></button>`
+  const name = displayName(star)
+  const title = `${name}${isSelected ? t.selectedSuffix : ""}${isObserver ? t.observerSuffix : ""}`
+  const distance = i18n.formatDistance(observerDistance(star, state.observer), state.unitMode)
+  return `<button type="button" class="entry${isSelected ? " active" : ""}${isObserver ? " observer-entry" : ""}" data-id="${escapeHtml(star.id)}"${isSelected ? ' aria-current="true"' : ""} title="${escapeHtml(title)}"><span class="dot" style="--c:${star.color}"></span><b>${escapeHtml(name)}</b>${isSelected ? `<span class="focus-mark">${t.selectedMark}</span>` : ""}${isObserver ? '<span class="observer-mark">◎</span>' : ""}<small class="distance">${distance}</small></button>`
 }
 
 export interface StarList {
@@ -22,7 +26,8 @@ export interface StarList {
   revealSelected(): void
 }
 
-export function mountStarList(store: Store<AppState>, actions: AppActions): StarList {
+export function mountStarList(store: Store<AppState>, actions: AppActions, i18n: I18n): StarList {
+  const t = i18n.t.starList
   const list = byId("starlist")
   const search = byId<HTMLInputElement>("search")
   const note = byId("focusedNote")
@@ -80,19 +85,19 @@ export function mountStarList(store: Store<AppState>, actions: AppActions): Star
     // Pin the focused star when it falls outside the first page or the search results.
     const pinned = selected !== null && active.includes(selected) && !first.includes(selected)
     const pinnedHtml = pinned
-      ? `<div class="pinned-heading">✦ Selected ${sorted.includes(selected) ? `(beyond the first ${LIST_LIMIT})` : "(not in the search results)"}</div>${renderEntry(selected, state)}<div class="pinned-divider"></div>`
+      ? `<div class="pinned-heading">${sorted.includes(selected) ? t.pinnedBeyondLimit(i18n.formatInteger(LIST_LIMIT)) : t.pinnedNotInResults}</div>${renderEntry(selected, state, i18n)}<div class="pinned-divider"></div>`
       : ""
-    const entries = first.map((star) => renderEntry(star, state)).join("")
+    const entries = first.map((star) => renderEntry(star, state, i18n)).join("")
     list.innerHTML =
-      pinnedHtml + entries || '<p style="font-size:12px;color:#8ba7bc">No matching stars</p>'
+      pinnedHtml + entries || `<p style="font-size:12px;color:#8ba7bc">${t.noMatches}</p>`
     if (sorted.length > LIST_LIMIT) {
       list.insertAdjacentHTML(
         "beforeend",
-        `<div class="small-note">${(sorted.length - LIST_LIMIT).toLocaleString("en-US")} more. Narrow down by name or catalog ID.</div>`,
+        `<div class="small-note">${t.more(i18n.formatInteger(sorted.length - LIST_LIMIT))}</div>`,
       )
     }
-    sortLabel.textContent = `By distance from the observer (${UNITS[state.unitMode].label})`
-    note.innerHTML = `✦ Selected: <strong>${selected ? escapeHtml(selected.name) : "—"}</strong>&emsp;<span class="legend-item">◎ Observer: ${escapeHtml(state.observer.name)}</span>`
+    sortLabel.textContent = t.sortLabel(i18n.t.units[state.unitMode].label)
+    note.innerHTML = `${t.selectedNote} <strong>${selected ? escapeHtml(displayName(selected)) : "—"}</strong>&emsp;<span class="legend-item">${t.observerNote} ${escapeHtml(displayName(state.observer))}</span>`
     if (reveal) revealSelected(state)
   }
 

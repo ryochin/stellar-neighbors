@@ -10,29 +10,31 @@
     <div class="app">
       <aside class="side">
         <div>
-          <div class="kicker">SOLAR NEIGHBORHOOD · INTERACTIVE ATLAS</div>
-          <h1>The Solar Neighborhood<br />in 3D, 100 Light-Years Across</h1>
-          <p class="sub">
-            Galactic coordinates, a 100 ly cube centered on the Sun<br />with an optional celestial
-            equator overlay
+          <div class="kicker" data-i18n="kicker">SOLAR NEIGHBORHOOD · INTERACTIVE ATLAS</div>
+          <h1 data-i18n-html="heading">
+            The Solar Neighborhood<br />in 3D, 100 Light-Years Across
+          </h1>
+          <p class="sub" data-i18n-html="subtitle">
+            A cube centered on the Sun, drawn in galactic coordinates<br />with an optional
+            celestial equator overlay
           </p>
         </div>
         <div class="statbar">
           <div class="stat">
             <div class="number" id="starCount">—</div>
-            <small>Stars and systems shown</small>
+            <small data-i18n="starCountCaption">Stars and systems shown</small>
           </div>
           <div class="stat">
             <div class="number" id="cubeSpanValue">
               100 <small style="display: inline">ly</small>
             </div>
-            <small>Cube edge length</small>
+            <small data-i18n="cubeEdgeCaption">Cube edge length</small>
           </div>
         </div>
         <div class="observer-box" aria-live="polite">
           <div class="observer-top">
             <div>
-              <small>Current observer</small>
+              <small data-i18n="currentObserver">Current observer</small>
               <div><strong id="observerName">Sun</strong></div>
             </div>
             <button
@@ -40,15 +42,26 @@
               id="returnSun"
               type="button"
               title="Move the observer back to the Sun"
+              data-i18n="returnSun"
+              data-i18n-title="returnSunTitle"
             >
               ☉ Back to the Sun
             </button>
           </div>
           <div class="observer-presets">
-            <button class="mini-button" id="observeSirius" type="button">View from Sirius</button>
-            <button class="mini-button" id="observeProxima" type="button">View from Proxima</button>
+            <button class="mini-button" id="observeSirius" type="button" data-i18n="viewFromSirius">
+              View from Sirius
+            </button>
+            <button
+              class="mini-button"
+              id="observeProxima"
+              type="button"
+              data-i18n="viewFromProxima"
+            >
+              View from Proxima
+            </button>
           </div>
-          <div class="observer-explain">
+          <div class="observer-explain" data-i18n="observerExplain">
             Select a star and press "Observe from this star", or double-click it, to move the
             distances, the star list and the cube origin there. The axes keep their orientation.
           </div>
@@ -56,10 +69,10 @@
         <div class="data-box" aria-live="polite">
           <p class="data-status" id="dataStatus">Loading star catalog…</p>
           <div class="data-tools">
-            <button id="retryLoad" type="button" hidden>↻ Retry</button>
+            <button id="retryLoad" type="button" hidden data-i18n="retry">↻ Retry</button>
           </div>
           <div class="filter-row">
-            <span>Max distance</span>
+            <span data-i18n="maxDistance">Max distance</span>
             <input
               id="distanceRange"
               type="range"
@@ -68,27 +81,30 @@
               value="87"
               step="1"
               aria-label="Maximum distance from the observer"
+              data-i18n-aria-label="maxDistanceAria"
             />
             <output id="distanceValue">87 ly</output>
           </div>
-          <div class="small-note">
+          <div class="small-note" data-i18n="catalogNote">
             Includes the stars of HYG v4.1 within about 173 ly of the Sun (about 9,600 entries), so
             nearby stars still show up after you move the observer. Stars missing from the catalog
             are not shown.
           </div>
         </div>
         <div class="panel">
-          <div class="guide-title">Coordinates and the galactic plane</div>
-          <p>
+          <div class="guide-title" data-i18n="guideTitle">Coordinates and the galactic plane</div>
+          <p data-i18n="guideBody">
             The XYZ axes follow galactic coordinates: the XY plane is the galactic plane (latitude b
             = 0°) and the Z axis points to the north galactic pole. Turn on the celestial equator to
             compare the same stars against the J2000 equator (δ = 0°) and the north celestial pole,
             which is tilted about 63° from the galactic pole.
           </p>
           <div class="key">
-            <span class="gp">Galactic plane</span><span class="gc">Galactic center</span
-            ><span class="gn">North galactic pole</span><span class="ce">Celestial equator</span
-            ><span class="cn">North celestial pole</span>
+            <span class="gp" data-i18n="keyGalacticPlane">Galactic plane</span
+            ><span class="gc" data-i18n="keyGalacticCenter">Galactic center</span
+            ><span class="gn" data-i18n="keyNorthGalacticPole">North galactic pole</span
+            ><span class="ce" data-i18n="keyCelestialEquator">Celestial equator</span
+            ><span class="cn" data-i18n="keyNorthCelestialPole">North celestial pole</span>
           </div>
         </div>
         <input
@@ -97,18 +113,22 @@
           type="search"
           placeholder="Search stars (e.g. Sirius)"
           aria-label="Search stars by name"
+          data-i18n-placeholder="searchPlaceholder"
+          data-i18n-aria-label="searchAria"
         />
         <div class="heading">
-          <span>Stars</span><span id="distanceSortLabel">By distance from the observer (ly)</span>
+          <span data-i18n="starsHeading">Stars</span
+          ><span id="distanceSortLabel">By distance from the observer (ly)</span>
         </div>
         <div id="focusedNote" class="focused-note" aria-live="polite"></div>
         <div
           id="starlist"
           class="starlist"
           aria-label="Star list. The selected star is cyan and the observer is gold"
+          data-i18n-aria-label="starListAria"
         ></div>
         <div id="selected" class="selected" aria-live="polite"></div>
-        <div class="source">
+        <div class="source" data-i18n-html="source">
           "View from another star" is a geometric comparison of distances between stars. It reflects
           parallax but not light travel time, proper motion or how bright the sky would really
           look.<br />
@@ -134,6 +154,7 @@
               id="equator"
               type="button"
               title="Show or hide the celestial equator (δ = 0°)"
+              data-i18n-title="equatorTitle"
             >
               Celestial equator: OFF
             </button>
@@ -145,10 +166,18 @@
               id="labels"
               type="button"
               title="Cycle labels: major, all, none"
+              data-i18n-title="labelsTitle"
             >
               Labels: Major
             </button>
-            <button class="tool active" id="grid" type="button" title="Show or hide the grid">
+            <button
+              class="tool active"
+              id="grid"
+              type="button"
+              title="Show or hide the grid"
+              data-i18n="grid"
+              data-i18n-title="gridTitle"
+            >
               Grid
             </button>
             <button
@@ -156,6 +185,7 @@
               id="galactic"
               type="button"
               title="Show or hide the galactic plane (b = 0°)"
+              data-i18n-title="galacticTitle"
             >
               Galactic plane: ON
             </button>
@@ -164,6 +194,8 @@
               id="galview"
               type="button"
               title="Look down on the galactic plane from the north galactic pole"
+              data-i18n="topDownView"
+              data-i18n-title="topDownViewTitle"
             >
               ↗ Top-down view
             </button>
@@ -172,6 +204,8 @@
               id="reset"
               type="button"
               title="Reset the view and return to the Sun (R)"
+              data-i18n="resetView"
+              data-i18n-title="resetViewTitle"
             >
               ↺ Reset view
             </button>
@@ -179,7 +213,7 @@
           <div class="legend"><div class="overlay-box" id="legend"></div></div>
         </div>
         <div class="tooltip" id="tooltip"></div>
-        <div class="instructions overlay-box">
+        <div class="instructions overlay-box" data-i18n-html="instructions">
           Drag: rotate / Wheel: zoom / Click a star: details<br />Double-click a star: observe from
           it / R: reset view
         </div>

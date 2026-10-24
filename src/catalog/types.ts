@@ -82,7 +82,10 @@ export interface Star {
   id: string
   /** English display name: proper name, else designation, else catalog ID. */
   name: string
-  /** Name in the additional locale: its own table, else its designation; null when it has neither. */
+  /**
+   * Name in the UI locale when it is not English: its own table, else its designation; null in
+   * English or when the star has neither.
+   */
   localName: string | null
   catalogLabel: string
   designation: Designation | null
