@@ -3,6 +3,7 @@ import namesJaUrl from "./catalog/data/names.ja.json?url"
 import catalogUrl from "./catalog/data/stars.json?url"
 import { loadCatalog, loadLocalNames, rowToStar, withLocalNames } from "./catalog/loader"
 import { SUN_ROW } from "./catalog/sun"
+import type { Star } from "./catalog/types"
 import { applyDocumentTranslations } from "./i18n/document"
 import { createI18n } from "./i18n/i18n"
 import { resolveLocale, type Locale } from "./i18n/locales"
@@ -38,7 +39,11 @@ const i18n = createI18n(locale)
 applyDocumentTranslations(document, locale, i18n.t)
 
 const englishSun = rowToStar(SUN_ROW)
-const placeholderSun = locale === "en" ? englishSun : { ...englishSun, localName: i18n.t.sun }
+// withLocalNames also rebuilds searchText, so the local name finds the Sun before the catalog loads.
+const placeholderSun: Star =
+  locale === "en"
+    ? englishSun
+    : withLocalNames([englishSun], new Map([[englishSun.id, i18n.t.sun]]), locale)[0]
 
 const store = createStore(createInitialState(placeholderSun))
 const actions = createActions(store)
