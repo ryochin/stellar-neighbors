@@ -17,7 +17,7 @@ const KEYS = [
 export function mountToolbar(
   store: Store<AppState>,
   actions: AppActions,
-  camera: Pick<StarRenderer, "resetView" | "lookFromGalacticPole">,
+  camera: Pick<StarRenderer, "resetView">,
   { t }: I18n,
 ): void {
   const equator = byId("equator")
@@ -33,7 +33,6 @@ export function mountToolbar(
   labels.addEventListener("click", () => actions.cycleLabelMode())
   grid.addEventListener("click", () => actions.toggleGrid())
   galactic.addEventListener("click", () => actions.toggleGalacticPlane())
-  byId("galview").addEventListener("click", () => camera.lookFromGalacticPole())
   byId("reset").addEventListener("click", () => camera.resetView())
 
   const render = (state: AppState): void => {

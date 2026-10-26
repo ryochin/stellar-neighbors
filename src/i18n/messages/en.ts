@@ -50,12 +50,10 @@ export const en = {
     grid: "Grid",
     gridTitle: "Show or hide the grid",
     galacticTitle: "Show or hide the galactic plane (b = 0°)",
-    topDownView: "↗ Top-down view",
-    topDownViewTitle: "Look down on the galactic plane from the north galactic pole",
     resetView: "↺ Reset view",
     resetViewTitle: "Reset the view and return to the Sun (R)",
     instructions:
-      "Drag: rotate / Wheel: zoom / Click a star: details<br />Double-click a star: observe from it / R: reset view",
+      "Drag: rotate / Wheel: zoom / Click a star: details<br />Double-click a star: observe from it / R: reset view / T: top-down view",
   },
   units: {
     ly: { label: "ly", name: "light-years" },

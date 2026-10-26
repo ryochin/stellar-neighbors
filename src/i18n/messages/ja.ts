@@ -39,12 +39,10 @@ export const ja: Messages = {
     grid: "グリッド",
     gridTitle: "グリッドの表示を切り替え",
     galacticTitle: "銀河面（b = 0°）の表示を切り替え",
-    topDownView: "↗ 真上から見る",
-    topDownViewTitle: "北銀極から銀河面を見下ろす",
     resetView: "↺ 視点をリセット",
     resetViewTitle: "視点を戻し、観測者を太陽に戻す（R）",
     instructions:
-      "ドラッグ: 回転 / ホイール: 拡大縮小 / 星をクリック: 詳細<br />星をダブルクリック: その星から観測 / R: 視点をリセット",
+      "ドラッグ: 回転 / ホイール: 拡大縮小 / 星をクリック: 詳細<br />星をダブルクリック: その星から観測 / R: 視点をリセット / T: 真上から見る",
   },
   units: {
     ly: { label: "光年", name: "光年（light-year）" },

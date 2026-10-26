@@ -105,15 +105,7 @@ async function loadWikipedia(): Promise<void> {
   }
 }
 
-mountToolbar(
-  store,
-  actions,
-  {
-    resetView: resetAll,
-    lookFromGalacticPole: () => renderer.lookFromGalacticPole(),
-  },
-  i18n,
-)
+mountToolbar(store, actions, { resetView: resetAll }, i18n)
 mountObserverBox(store, actions)
 mountDataPanel(store, actions, () => void loadStars(), i18n)
 const starList = mountStarList(store, actions, i18n)
@@ -121,9 +113,11 @@ mountDetailPanel(store, actions, i18n)
 
 const search = byId<HTMLInputElement>("search")
 window.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "r" && document.activeElement !== search) {
-    resetAll()
-  }
+  // Leave browser shortcuts such as Cmd+R / Ctrl+T alone.
+  if (document.activeElement === search || e.metaKey || e.ctrlKey || e.altKey) return
+  const key: string = e.key.toLowerCase()
+  if (key === "r") resetAll()
+  else if (key === "t") renderer.lookFromGalacticPole()
 })
 
 void loadStars()
