@@ -5,6 +5,7 @@ import {
   easeInOutCubic,
   galacticPoleAngles,
   interpolateAngles,
+  PITCH_LIMIT,
   project,
 } from "../../src/render/canvas2d/camera"
 
@@ -31,6 +32,8 @@ describe("project", () => {
       { yaw: 0, pitch: 0, zoom: 1 },
       defaultAngles(),
       { yaw: -2.1, pitch: -1.2, zoom: 3 },
+      { yaw: 1.3, pitch: PITCH_LIMIT, zoom: 1 },
+      { yaw: -0.7, pitch: -PITCH_LIMIT, zoom: 1 },
     ]) {
       // Undo the perspective so each row is the axis in (right, up, toward-viewer) form.
       const rows: number[][] = (
@@ -79,6 +82,10 @@ describe("galacticPoleAngles", () => {
     const angles = galacticPoleAngles()
     expect(angles.pitch).toBeCloseTo(Math.PI / 2, 9)
     expect(angles.zoom).toBe(1.08)
+  })
+
+  it("sits at the drag pitch limit, so a drag from the top-down view does not jump", () => {
+    expect(galacticPoleAngles().pitch).toBe(PITCH_LIMIT)
   })
 })
 

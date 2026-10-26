@@ -21,7 +21,8 @@ export interface Projected {
 
 export const MIN_ZOOM = 0.5
 export const MAX_ZOOM = 12
-export const PITCH_LIMIT = 1.47
+// Drag may reach the poles: project() rotates explicitly, so pitch ±π/2 has no singularity.
+export const PITCH_LIMIT = Math.PI / 2
 const PERSPECTIVE_DISTANCE = 240
 
 // Small enough to keep the axis labels clear of the toolbar and legend on a 1440px screen.
