@@ -9,15 +9,16 @@ import {
   type CuratedStar,
 } from "../../scripts/catalog-builder"
 
+// Sirius carries a Greek var value to check that it is dropped, as HYG does for Algol.
 const CSV = [
-  '"id","hip","hd","hr","gl","bf","proper","ra","dec","dist","mag","spect","bayer","flam","con"',
-  '0,,,,"","",Sol,0.0,0.0,0.0,-26.7,G2V,,,',
-  '32263,32349,48915,2491,"Gl 244A","9Alp CMa",Sirius,6.752481,-16.716116,2.6371,-1.44,A0m,Alp,9,CMa',
-  '70666,70890,,,"Gl 551","",Proxima Centauri,14.495985,-62.679485,1.3012,11.01,M5Ve,,,Cen',
-  '99,,,,"","","",1.0,10.0,60.0,9.0,K2,,,',
-  '100,,,,"","","",2.0,20.0,100000,9.0,M0,,,',
-  '101,500,,,"","","",3.0,bad,10,9.0,M0,,,',
-  '102,,,,"","","",4.0,5.0,20.0,,DA2,,,',
+  '"id","hip","hd","hr","gl","bf","proper","ra","dec","dist","mag","spect","bayer","flam","con","var"',
+  '0,,,,"","",Sol,0.0,0.0,0.0,-26.7,G2V,,,,',
+  '32263,32349,48915,2491,"Gl 244A","9Alp CMa",Sirius,6.752481,-16.716116,2.6371,-1.44,A0m,Alp,9,CMa,Alp',
+  '70666,70890,,,"Gl 551","",Proxima Centauri,14.495985,-62.679485,1.3012,11.01,M5Ve,,,Cen,V645',
+  '99,,,,"","","",1.0,10.0,60.0,9.0,K2,,,,',
+  '100,,,,"","","",2.0,20.0,100000,9.0,M0,,,,',
+  '101,500,,,"","","",3.0,bad,10,9.0,M0,,,,',
+  '102,,,,"","","",4.0,5.0,20.0,,DA2,,,Tau,',
 ].join("\n")
 
 const curated = (overrides: Partial<CuratedStar> & Pick<CuratedStar, "name">): CuratedStar => ({
@@ -99,7 +100,7 @@ describe("buildCatalogRows", () => {
       "4,4,4,5,dK6",
     ].join("\n")
     const { rows } = buildCatalogRows(parseHygCsv(csv), [])
-    expect(rows.map((row) => row[10])).toEqual(["D", "M", "M", "K"])
+    expect(rows.map((row) => row[14])).toEqual(["D", "M", "M", "K"])
   })
 
   it("fuzzy-matches across the 0h/24h RA boundary", () => {
@@ -111,13 +112,18 @@ describe("buildCatalogRows", () => {
 
   it("merges curated names by explicit id, HIP and fuzzy match", () => {
     const { rows, logs } = buildCatalogRows(parseHygCsv(CSV), CURATED)
-    expect(rows[0]).toEqual(["hyg-0", "Sun", "", "", null, "", "", 0, 0, 0, "G", -26.7, 9])
+    // prettier-ignore
+    expect(rows[0]).toEqual(["hyg-0", "Sun", "", null, null, null, "", null, "", "", "", 0, 0, 0, "G", -26.7, 9])
     expect(rows[1]).toEqual([
       "hyg-32263",
       "Sirius",
       "Gl 244A",
+      32349,
+      48915,
+      2491,
       "Alp",
       9,
+      "",
       "CMa",
       "",
       8.601,
@@ -127,11 +133,13 @@ describe("buildCatalogRows", () => {
       -1.44,
       9,
     ])
-    // A constellation without a Bayer letter or Flamsteed number is no designation.
-    expect(rows[2]?.slice(1, 7)).toEqual(["Proxima Centauri", "Gl 551", "", null, "", ""])
-    expect(rows[3]?.slice(0, 3)).toEqual(["hyg-102", "", "HYG 102"])
-    expect(rows[3]?.[10]).toBe("D")
-    expect(rows[4]?.slice(0, 7)).toEqual(["curated-3", "Imaginary", "", "", null, "", ""])
+    // A variable star name keeps its constellation.
+    expect(rows[2]?.slice(6, 10)).toEqual(["", null, "V645", "Cen"])
+    // A constellation alone is no designation.
+    expect(rows[3]?.slice(0, 10)).toEqual(["hyg-102", "", "", null, null, null, "", null, "", ""])
+    expect(rows[3]?.[14]).toBe("D")
+    // prettier-ignore
+    expect(rows[4]?.slice(0, 11)).toEqual(["curated-3", "Imaginary", "", null, null, null, "", null, "", "", ""])
     expect(logs.map((log) => log.method)).toEqual(["hyg", "hip", "fuzzy", "none"])
   })
 
@@ -156,7 +164,7 @@ describe("buildCatalogRows", () => {
     ]
     const { rows } = buildCatalogRows(parseHygCsv(CSV), fixed)
     expect(rows[1]?.slice(0, 3)).toEqual(["hyg-32263", "Sirius", "Gl 244A"])
-    expect(rows[1]?.[7]).toBe(30)
+    expect(rows[1]?.[11]).toBe(30)
   })
 
   it("fails when two curated stars claim the same HYG record", () => {
@@ -180,7 +188,17 @@ describe("double stars", () => {
 
   it("tells components apart by the letter ending their Gliese label", () => {
     const { rows } = buildCatalogRows(parseHygCsv(csv), [])
-    expect(rows.map((row) => row[6])).toEqual(["A", "B", "", "", ""])
+    expect(rows.map((row) => row[10])).toEqual(["A", "B", "", "", ""])
+  })
+
+  it("does not treat stars that only have variable names as one designation", () => {
+    const variables = [
+      '"id","gl","ra","dec","dist","con","var"',
+      '1,"Gl 1A",1.0,1.0,20,Cet,UV',
+      '2,"Gl 2B",2.0,2.0,20,Cet,YZ',
+    ].join("\n")
+    const { rows } = buildCatalogRows(parseHygCsv(variables), [])
+    expect(rows.map((row) => row[10])).toEqual(["", ""])
   })
 })
 

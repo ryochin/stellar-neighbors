@@ -40,7 +40,7 @@ export const en = {
     keyCelestialEquator: "Celestial equator",
     keyNorthCelestialPole: "North celestial pole",
     searchPlaceholder: "Search stars (e.g. Sirius)",
-    searchAria: "Search stars by name",
+    searchAria: "Search stars by name, designation or catalog ID",
     starsHeading: "Stars",
     starListAria: "Star list. The selected star is cyan and the observer is gold",
     source:
@@ -100,8 +100,10 @@ export const en = {
     galacticLongitude: "Galactic longitude l (from the Sun)",
     galacticLatitude: "Galactic latitude b (from the Sun)",
     rightAscension: "Right ascension (J2000, from the Sun)",
+    declination: "Declination (J2000, from the Sun)",
     spectralType: "Spectral type (approx.)",
-    catalogId: "Catalog ID",
+    designations: "Designations",
+    catalogIds: "Catalog IDs",
     apparentMagnitude: "Apparent magnitude (from Earth)",
   },
   starList: {
@@ -111,7 +113,8 @@ export const en = {
     pinnedBeyondLimit: (limit: string): string => `✦ Selected (beyond the first ${limit})`,
     pinnedNotInResults: "✦ Selected (not in the search results)",
     noMatches: "No matching stars",
-    more: (count: string): string => `${count} more. Narrow down by name or catalog ID.`,
+    more: (count: string): string =>
+      `${count} more. Narrow down by name, designation or catalog ID.`,
     sortLabel: (unit: string): string => `By distance from the observer (${unit})`,
     selectedNote: "✦ Selected:",
     observerNote: "◎ Observer:",

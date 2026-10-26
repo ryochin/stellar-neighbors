@@ -7,6 +7,7 @@ export function makeStar(id: string, eq: Vec3, overrides: Partial<Star> = {}): S
     name: id,
     localName: null,
     catalogLabel: "",
+    catalogIds: { gl: "", hip: null, hd: null, hr: null },
     designation: null,
     searchText: id,
     distLy: Math.hypot(...eq),

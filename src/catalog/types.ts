@@ -1,13 +1,17 @@
 export type Vec3 = readonly [number, number, number]
 
-export const CATALOG_VERSION = 2
+export const CATALOG_VERSION = 3
 
 export const CATALOG_FIELDS = [
   "id",
   "name",
-  "catalogLabel",
+  "gl",
+  "hip",
+  "hd",
+  "hr",
   "bayer",
   "flamsteed",
+  "variable",
   "constellation",
   "component",
   "distLy",
@@ -22,11 +26,17 @@ export type CatalogRow = [
   id: string,
   /** English proper name; empty when the star only has a designation or a catalog ID. */
   name: string,
-  catalogLabel: string,
+  /** Gliese / GJ number with its prefix, as in HYG ("Gl 244A", "GJ 1061"). */
+  gl: string,
+  hip: number | null,
+  hd: number | null,
+  hr: number | null,
   /** HYG Bayer letter with its superscript index ("Alp", "Pi-3"); empty when none. */
   bayer: string,
   flamsteed: number | null,
-  /** IAU abbreviation; empty unless the star has a Bayer or Flamsteed designation. */
+  /** Variable star prefix without the constellation ("UV", "V645"); empty when none. */
+  variable: string,
+  /** IAU abbreviation; empty unless the star has a designation or a variable star name. */
   constellation: string,
   /** "A" / "B" when several stars share one designation. */
   component: string,
@@ -58,8 +68,17 @@ export interface Designation {
   /** Superscript index of the Bayer letter (the 3 of Pi3 Orionis). */
   bayerIndex: number | null
   flamsteed: number | null
+  /** Variable star prefix ("UV", "V645"). */
+  variable: string | null
   constellation: string
   component: string
+}
+
+export interface CatalogIds {
+  gl: string
+  hip: number | null
+  hd: number | null
+  hr: number | null
 }
 
 /** Names of the stars in one locale, keyed by star id. */
@@ -87,7 +106,10 @@ export interface Star {
    * English or when the star has neither.
    */
   localName: string | null
+  /** The one catalog ID used as a fallback name: Gliese, else HIP, else HD. */
   catalogLabel: string
+  catalogIds: CatalogIds
+  /** Bayer, Flamsteed and variable star names; null when the star has none. */
   designation: Designation | null
   /** Lowercased names without diacritics, for search. */
   searchText: string

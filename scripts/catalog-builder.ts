@@ -1,5 +1,6 @@
 import { LY_PER_PC } from "../src/astro/units"
 import { MAX_OBSERVER_DISTANCE_LY } from "../src/astro/visibility"
+import { primaryCatalogId } from "../src/catalog/aliases"
 import { rowToStar } from "../src/catalog/loader"
 import {
   CATALOG_FIELDS,
@@ -11,6 +12,7 @@ import {
   type CatalogRow,
   type LocalNamesFile,
 } from "../src/catalog/types"
+import { isGreekLetter } from "../src/i18n/catalog/designation"
 import type { Locale } from "../src/i18n/locales"
 
 // Twice the observer limit: an observer at the limit still has its whole cube populated.
@@ -24,9 +26,12 @@ export interface HygRecord {
   gl: string
   hip: string
   hd: string
+  hr: string
   /** Bayer letter as in HYG ("Alp", "Pi-3"). */
   bayer: string
   flamsteed: number | null
+  /** Variable star prefix ("UV", "V645"); HYG's Greek values only repeat the Bayer letter. */
+  variable: string
   /** IAU constellation abbreviation. */
   con: string
   raH: number
@@ -115,14 +120,17 @@ export function parseHygCsv(csv: string, maxDistanceLy = MAX_CATALOG_DISTANCE_LY
     if (raH < 0 || raH > 24 || decDeg < -90 || decDeg > 90) continue
     const mag = parseNumber(get("mag"))
     const flamsteed = parseNumber(get("flam"))
+    const variable = get("var")
     records.push({
       id,
       proper: get("proper"),
       gl: get("gl"),
       hip: get("hip"),
       hd: get("hd"),
+      hr: get("hr"),
       bayer: get("bayer"),
       flamsteed: Number.isFinite(flamsteed) ? flamsteed : null,
+      variable: isGreekLetter(variable) ? "" : variable,
       con: get("con"),
       raH,
       decDeg,
@@ -134,13 +142,15 @@ export function parseHygCsv(csv: string, maxDistanceLy = MAX_CATALOG_DISTANCE_LY
   return records
 }
 
-// HYG's gl column already carries its prefix ("Gl 244A", "GJ 1293").
-export function hygCatalogLabel(record: HygRecord): string {
-  if (record.gl) return record.gl
-  if (record.hip) return `HIP ${record.hip}`
-  if (record.hd) return `HD ${record.hd}`
-  return `HYG ${record.id}`
+const parseId = (text: string): number | null => {
+  const id = parseNumber(text)
+  return Number.isInteger(id) ? id : null
 }
+
+// HYG's gl column already carries its prefix ("Gl 244A", "GJ 1293").
+export const hygCatalogLabel = (record: HygRecord): string =>
+  primaryCatalogId({ gl: record.gl, hip: parseId(record.hip), hd: parseId(record.hd), hr: null }) ||
+  `HYG ${record.id}`
 
 // Uppercase D marks a white dwarf; HYG's older lowercase "d" prefix (dM5.5e) means a dwarf.
 function spectralClass(spect: string): string {
@@ -213,8 +223,12 @@ export function buildCatalogRows(
         `curated-${index}`,
         star.name,
         "",
+        null,
+        null,
+        null,
         "",
         null,
+        "",
         "",
         "",
         round(star.distLy, 3),
@@ -246,16 +260,20 @@ export function buildCatalogRows(
 
   const rows = records.map((record): CatalogRow => {
     const star = overrides.get(record.id)
-    // The Sun has no catalog ID; without this, HYG's Sol row would fall back to "HYG 0".
-    const label = record.distLy === 0 ? "" : hygCatalogLabel(record)
-    const designated = record.con !== "" && (record.bayer !== "" || record.flamsteed !== null)
+    const designated =
+      record.con !== "" &&
+      (record.bayer !== "" || record.flamsteed !== null || record.variable !== "")
     const basePriority = record.proper ? 4 : 0
     return [
       `hyg-${record.id}`,
       star?.name ?? record.proper,
-      label,
+      record.gl,
+      parseId(record.hip),
+      parseId(record.hd),
+      parseId(record.hr),
       designated ? record.bayer : "",
       designated ? record.flamsteed : null,
+      designated ? record.variable : "",
       designated ? record.con : "",
       "",
       round(star?.trustCuratedDistance ? star.distLy : record.distLy, 3),
@@ -273,16 +291,20 @@ export function buildCatalogRows(
 // Components of a double star share one designation; tell them apart by the letter that
 // ends their Gliese label ("Gl 278A", "Gl 278B"). Stars without one keep the shared name.
 function assignComponents(rows: CatalogRow[]): CatalogRow[] {
-  const keyOf = (row: CatalogRow): string => `${row[3]}|${row[4]}|${row[5]}`
+  // Variable star names belong to one star, so only Bayer and Flamsteed designations count.
+  const keyOf = ([, , , , , , bayer, flamsteed, , constellation]: CatalogRow): string | null =>
+    constellation && (bayer || flamsteed !== null) ? `${bayer}|${flamsteed}|${constellation}` : null
   const counts = new Map<string, number>()
   for (const row of rows) {
-    if (row[5]) counts.set(keyOf(row), (counts.get(keyOf(row)) ?? 0) + 1)
+    const key = keyOf(row)
+    if (key) counts.set(key, (counts.get(key) ?? 0) + 1)
   }
   return rows.map((row): CatalogRow => {
-    if (!row[5] || (counts.get(keyOf(row)) ?? 0) < 2) return row
-    const component = row[2].match(/[A-Z]$/)?.[0] ?? ""
+    const key = keyOf(row)
+    if (!key || (counts.get(key) ?? 0) < 2) return row
+    const [, , gl] = row
     const next: CatalogRow = [...row]
-    next[6] = component
+    next[10] = gl.match(/[A-Z]$/)?.[0] ?? ""
     return next
   })
 }

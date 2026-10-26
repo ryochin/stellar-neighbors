@@ -1,6 +1,7 @@
 import { equatorialToCartesian, equatorialToGalactic, galacticAngles } from "../astro/coordinates"
 import { formatDesignation } from "../i18n/catalog/designation"
 import type { Locale } from "../i18n/locales"
+import { primaryCatalogId, searchTerms } from "./aliases"
 import { normalizeSearchText } from "./search-text"
 import {
   CATALOG_FIELDS,
@@ -9,6 +10,7 @@ import {
   type CatalogFile,
   type CatalogMeta,
   isNamesTable,
+  type CatalogIds,
   type CatalogRow,
   type Designation,
   type LocalNamesFile,
@@ -37,23 +39,28 @@ const defaultFetch: FetchFn = (input) => fetch(input)
 
 // HYG writes a Bayer letter with a superscript index as "Pi-3".
 function toDesignation(row: CatalogRow): Designation | null {
-  const [, , , bayer, flamsteed, constellation, component] = row
-  if (!constellation || (!bayer && flamsteed === null)) return null
+  const [, , , , , , bayer, flamsteed, variable, constellation, component] = row
+  if (!constellation || (!bayer && flamsteed === null && !variable)) return null
   const [letter, index] = bayer.split("-")
   return {
     bayer: letter || null,
     bayerIndex: index ? Number(index) : null,
     flamsteed,
+    variable: variable || null,
     constellation,
     component,
   }
 }
 
-const searchTextOf = (star: Pick<Star, "name" | "localName" | "catalogLabel">): string =>
-  normalizeSearchText([star.name, star.localName ?? "", star.catalogLabel].join("\n"))
+const searchTextOf = (star: Parameters<typeof searchTerms>[0], locale: Locale): string =>
+  normalizeSearchText(searchTerms(star, locale).join("\n"))
 
 export function rowToStar(row: CatalogRow): Star {
-  const [id, properName, catalogLabel, , , , , distLy, raH, decDeg, spec, mag, priority] = row
+  const [id, properName, gl, hip, hd, hr, , , , , , distLy, raH, decDeg, spec, mag, priority] = row
+  const catalogIds: CatalogIds = { gl, hip, hd, hr }
+  // A HYG row without any catalog ID keeps its HYG number; the Sun goes without.
+  const hygFallback = id.startsWith("hyg-") && distLy > 0 ? `HYG ${id.slice(4)}` : ""
+  const catalogLabel = primaryCatalogId(catalogIds) || hygFallback
   const designation = toDesignation(row)
   const name = properName || (designation && formatDesignation(designation, "en")) || catalogLabel
   const eq = equatorialToCartesian(raH, decDeg, distLy)
@@ -64,8 +71,12 @@ export function rowToStar(row: CatalogRow): Star {
     name,
     localName: null,
     catalogLabel,
+    catalogIds,
     designation,
-    searchText: searchTextOf({ name, localName: null, catalogLabel }),
+    searchText: searchTextOf(
+      { name, localName: null, catalogLabel, catalogIds, designation },
+      "en",
+    ),
     distLy,
     raH,
     decDeg,
@@ -132,6 +143,6 @@ export function withLocalNames(
       names.get(star.id) ??
       (star.designation && formatDesignation(star.designation, locale)) ??
       null
-    return { ...star, localName, searchText: searchTextOf({ ...star, localName }) }
+    return { ...star, localName, searchText: searchTextOf({ ...star, localName }, locale) }
   })
 }
