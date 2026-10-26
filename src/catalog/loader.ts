@@ -3,6 +3,7 @@ import { formatDesignation } from "../i18n/catalog/designation"
 import type { Locale } from "../i18n/locales"
 import { primaryCatalogId, searchTerms } from "./aliases"
 import { normalizeSearchText } from "./search-text"
+import { spectralClass } from "./spectral"
 import {
   CATALOG_FIELDS,
   CATALOG_VERSION,
@@ -56,7 +57,8 @@ const searchTextOf = (star: Parameters<typeof searchTerms>[0], locale: Locale): 
   normalizeSearchText(searchTerms(star, locale).join("\n"))
 
 export function rowToStar(row: CatalogRow): Star {
-  const [id, properName, gl, hip, hd, hr, , , , , , distLy, raH, decDeg, spec, mag, priority] = row
+  const [id, properName, gl, hip, hd, hr, , , , , , distLy, raH, decDeg, spect, mag, priority] = row
+  const spec = spectralClass(spect)
   const catalogIds: CatalogIds = { gl, hip, hd, hr }
   // A HYG row without any catalog ID keeps its HYG number; the Sun goes without.
   const hygFallback = id.startsWith("hyg-") && distLy > 0 ? `HYG ${id.slice(4)}` : ""
@@ -80,6 +82,7 @@ export function rowToStar(row: CatalogRow): Star {
     distLy,
     raH,
     decDeg,
+    spectralType: spect,
     spec,
     mag,
     priority,

@@ -1,3 +1,4 @@
+import { formatDeclination, formatRightAscension } from "../astro/sexagesimal"
 import { MAX_OBSERVER_DISTANCE_LY, canObserveFrom, observerDistance } from "../astro/visibility"
 import { catalogIdList, otherDesignations } from "../catalog/aliases"
 import { displayName, secondaryName } from "../catalog/display-name"
@@ -63,9 +64,9 @@ ${subtitle ? `<p>${subtitle}</p>` : ""}
 ${observingFromSun ? "" : `<div><small>${t.distanceFromSun}</small><strong>${fmt(star.distLy)}</strong></div>`}
 <div><small>${t.galacticLongitude}</small><strong>${star.l === null ? "—" : `${star.l.toFixed(1)}°`}</strong></div>
 <div><small>${t.galacticLatitude}</small><strong>${star.b === null ? "—" : signed(star.b)}</strong></div>
-<div><small>${t.rightAscension}</small><strong>${hasDirection ? `${star.raH.toFixed(2)} h` : "—"}</strong></div>
-<div><small>${t.declination}</small><strong>${hasDirection ? signed(star.decDeg) : "—"}</strong></div>
-<div><small>${t.spectralType}</small><strong>${star.spec ? escapeHtml(star.spec) : "—"}</strong></div>
+<div><small>${t.rightAscension}</small><strong>${hasDirection ? formatRightAscension(star.raH) : "—"}</strong></div>
+<div><small>${t.declination}</small><strong>${hasDirection ? formatDeclination(star.decDeg) : "—"}</strong></div>
+<div><small>${t.spectralType}</small><strong>${star.spectralType ? escapeHtml(star.spectralType) : "—"}</strong></div>
 <div><small>${t.apparentMagnitude}</small><strong>${star.mag === null ? "—" : star.mag.toFixed(2)}</strong></div>
 ${designations.length > 0 ? `<div class="wide aliases"><small>${t.designations}</small><strong>${list(designations)}</strong></div>` : ""}
 <div class="wide aliases"><small>${t.catalogIds}</small><strong>${catalogIds.length > 0 ? list(catalogIds) : "—"}</strong></div>

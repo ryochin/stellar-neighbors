@@ -13,6 +13,7 @@ export function makeStar(id: string, eq: Vec3, overrides: Partial<Star> = {}): S
     distLy: Math.hypot(...eq),
     raH: 0,
     decDeg: 0,
+    spectralType: "G2V",
     spec: "G",
     mag: null,
     priority: 0,

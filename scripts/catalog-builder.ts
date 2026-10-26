@@ -152,11 +152,13 @@ export const hygCatalogLabel = (record: HygRecord): string =>
   primaryCatalogId({ gl: record.gl, hip: parseId(record.hip), hd: parseId(record.hd), hr: null }) ||
   `HYG ${record.id}`
 
-// Uppercase D marks a white dwarf; HYG's older lowercase "d" prefix (dM5.5e) means a dwarf.
-function spectralClass(spect: string): string {
-  if (spect.startsWith("D")) return "D"
-  return spect.toUpperCase().match(/[OBAFGKM]/)?.[0] ?? ""
-}
+// HYG ends a spectral type with "..." when the source cut it short ("A0m..."); in the panel that
+// reads like clipped text, so drop it along with runs of spaces ("dM6  e").
+const normalizeSpectralType = (spect: string): string =>
+  spect
+    .replace(/\.{3}$/, "")
+    .replace(/\s+/g, " ")
+    .trim()
 
 function raDifference(a: number, b: number): number {
   const d = Math.abs(a - b) % 24
@@ -279,7 +281,7 @@ export function buildCatalogRows(
       round(star?.trustCuratedDistance ? star.distLy : record.distLy, 3),
       round(record.raH, 6),
       round(record.decDeg, 5),
-      spectralClass(record.spect),
+      normalizeSpectralType(record.spect),
       record.mag,
       Math.max(basePriority, star?.priority ?? 0),
     ]

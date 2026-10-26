@@ -77,7 +77,7 @@ export const ja: Messages = {
     galacticLatitude: "銀緯 b（太陽から）",
     rightAscension: "赤経（J2000、太陽から）",
     declination: "赤緯（J2000、太陽から）",
-    spectralType: "スペクトル型（概略）",
+    spectralType: "スペクトル型",
     designations: "符号",
     catalogIds: "カタログ番号",
     apparentMagnitude: "見かけの等級（地球から）",

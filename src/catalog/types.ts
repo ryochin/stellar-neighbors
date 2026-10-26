@@ -1,6 +1,6 @@
 export type Vec3 = readonly [number, number, number]
 
-export const CATALOG_VERSION = 3
+export const CATALOG_VERSION = 4
 
 export const CATALOG_FIELDS = [
   "id",
@@ -17,7 +17,7 @@ export const CATALOG_FIELDS = [
   "distLy",
   "raH",
   "decDeg",
-  "spec",
+  "spectralType",
   "mag",
   "priority",
 ] as const
@@ -43,7 +43,8 @@ export type CatalogRow = [
   distLy: number,
   raH: number,
   decDeg: number,
-  spec: string,
+  /** Spectral type as in HYG ("A0mA1Va", "M3.5Ve"); a class letter for curated stars; may be empty. */
+  spectralType: string,
   mag: number | null,
   priority: number,
 ]
@@ -116,6 +117,8 @@ export interface Star {
   distLy: number
   raH: number
   decDeg: number
+  spectralType: string
+  /** Class letter of the spectral type ("A"), "D" for white dwarfs; empty when unknown. */
   spec: string
   mag: number | null
   priority: number

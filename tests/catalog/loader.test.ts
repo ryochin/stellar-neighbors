@@ -8,7 +8,7 @@ import {
   withLocalNames,
 } from "../../src/catalog/loader"
 import { SUN_ROW } from "../../src/catalog/sun"
-import { CATALOG_FIELDS, type CatalogRow } from "../../src/catalog/types"
+import { CATALOG_FIELDS, CATALOG_VERSION, type CatalogRow } from "../../src/catalog/types"
 
 const SIRIUS_ROW: CatalogRow = [
   "hyg-32263",
@@ -25,7 +25,7 @@ const SIRIUS_ROW: CatalogRow = [
   8.601,
   6.752481,
   -16.716116,
-  "A",
+  "A0m",
   -1.44,
   9,
 ]
@@ -58,7 +58,7 @@ const PROXIMA_ROW: CatalogRow = ["hyg-70666", "", "Gl 551", 70890, null, null, "
 const HIP_ONLY_ROW: CatalogRow = ["hyg-2", "", "", 2, 224690, null, "", null, "", "", "", 156.43, 0.000283, -19.49884, "K", 9.27, 0]
 
 const validFile = () => ({
-  version: 3,
+  version: CATALOG_VERSION,
   meta: {
     source: "test",
     license: "CC BY-SA 4.0",
@@ -82,6 +82,13 @@ describe("rowToStar", () => {
     expect(sun.l).toBeNull()
     expect(sun.color).toBe("#ffe9b3")
     expect(sun.designation).toBeNull()
+  })
+
+  it("keeps the full spectral type and colors the star by its class", () => {
+    const sirius = rowToStar(SIRIUS_ROW)
+    expect(sirius.spectralType).toBe("A0m")
+    expect(sirius.spec).toBe("A")
+    expect(sirius.color).toBe("#c2dfff")
   })
 
   it("derives galactic coordinates from RA/Dec/distance", () => {

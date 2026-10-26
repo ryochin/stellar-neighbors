@@ -90,7 +90,7 @@ export const en = {
     galacticLatitude: "Galactic latitude b (from the Sun)",
     rightAscension: "Right ascension (J2000, from the Sun)",
     declination: "Declination (J2000, from the Sun)",
-    spectralType: "Spectral type (approx.)",
+    spectralType: "Spectral type",
     designations: "Designations",
     catalogIds: "Catalog IDs",
     apparentMagnitude: "Apparent magnitude (from Earth)",

@@ -91,16 +91,17 @@ describe("parseHygCsv", () => {
 })
 
 describe("buildCatalogRows", () => {
-  it("treats a lowercase d prefix as dwarf, not white dwarf", () => {
+  it("keeps HYG's spectral type without a trailing ellipsis or runs of spaces", () => {
     const csv = [
       '"id","ra","dec","dist","spect"',
       "1,1,1,5,DA2",
       "2,2,2,5,dM5.5e",
       "3,3,3,5,dM6  e",
       "4,4,4,5,dK6",
+      "5,5,5,5,K0III...",
     ].join("\n")
     const { rows } = buildCatalogRows(parseHygCsv(csv), [])
-    expect(rows.map((row) => row[14])).toEqual(["D", "M", "M", "K"])
+    expect(rows.map((row) => row[14])).toEqual(["DA2", "dM5.5e", "dM6 e", "dK6", "K0III"])
   })
 
   it("fuzzy-matches across the 0h/24h RA boundary", () => {
@@ -113,7 +114,7 @@ describe("buildCatalogRows", () => {
   it("merges curated names by explicit id, HIP and fuzzy match", () => {
     const { rows, logs } = buildCatalogRows(parseHygCsv(CSV), CURATED)
     // prettier-ignore
-    expect(rows[0]).toEqual(["hyg-0", "Sun", "", null, null, null, "", null, "", "", "", 0, 0, 0, "G", -26.7, 9])
+    expect(rows[0]).toEqual(["hyg-0", "Sun", "", null, null, null, "", null, "", "", "", 0, 0, 0, "G2V", -26.7, 9])
     expect(rows[1]).toEqual([
       "hyg-32263",
       "Sirius",
@@ -129,7 +130,7 @@ describe("buildCatalogRows", () => {
       8.601,
       6.752481,
       -16.71612,
-      "A",
+      "A0m",
       -1.44,
       9,
     ])
@@ -137,7 +138,7 @@ describe("buildCatalogRows", () => {
     expect(rows[2]?.slice(6, 10)).toEqual(["", null, "V645", "Cen"])
     // A constellation alone is no designation.
     expect(rows[3]?.slice(0, 10)).toEqual(["hyg-102", "", "", null, null, null, "", null, "", ""])
-    expect(rows[3]?.[14]).toBe("D")
+    expect(rows[3]?.[14]).toBe("DA2")
     // prettier-ignore
     expect(rows[4]?.slice(0, 11)).toEqual(["curated-3", "Imaginary", "", null, null, null, "", null, "", "", ""])
     expect(logs.map((log) => log.method)).toEqual(["hyg", "hip", "fuzzy", "none"])

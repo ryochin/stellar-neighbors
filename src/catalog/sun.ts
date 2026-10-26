@@ -16,7 +16,7 @@ export const SUN_ROW: CatalogRow = [
   0,
   0,
   0,
-  "G",
+  "G2V",
   -26.7,
   9,
 ]
