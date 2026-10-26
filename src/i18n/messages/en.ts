@@ -72,12 +72,7 @@ export const en = {
       none: "Labels: None",
     } as Record<LabelMode, string>,
     legendFrame: "GALACTIC COORDINATES",
-    legendGalacticPlane: "GALACTIC PLANE (b=0°)",
-    legendCelestialEquator: "CELESTIAL EQUATOR (δ=0°)",
-    legendUnits: (label: string): string => `UNITS: ${label}`,
-    axisHint: "X: galactic center (l = 0°) · Y: l = 90° · Z: north galactic pole (b = +90°)",
-    planeHint: (label: string): string =>
-      `Galactic plane: b = 0° / Galactic center: l = 0° / Distances in ${label}`,
+    legendObserver: "OBSERVER:",
   },
   dataPanel: {
     loading: "Loading star catalog…",

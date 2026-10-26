@@ -59,11 +59,7 @@ export const ja: Messages = {
       none: "ラベル: なし",
     },
     legendFrame: "銀河座標",
-    legendGalacticPlane: "銀河面 (b=0°)",
-    legendCelestialEquator: "天の赤道 (δ=0°)",
-    legendUnits: (label) => `単位: ${label}`,
-    axisHint: "X: 銀河中心 (l = 0°) · Y: l = 90° · Z: 北銀極 (b = +90°)",
-    planeHint: (label) => `銀河面: b = 0° / 銀河中心: l = 0° / 距離の単位: ${label}`,
+    legendObserver: "観測者:",
   },
   dataPanel: {
     loading: "星のカタログを読み込んでいます…",

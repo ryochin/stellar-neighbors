@@ -24,7 +24,6 @@ export function mountToolbar(
   const labels = byId("labels")
   const coordinates = byId("coordinates")
   const legend = byId("legend")
-  const hint = byId("hint")
 
   equator.addEventListener("click", () => actions.toggleCelestialEquator())
   units.addEventListener("click", () => actions.cycleUnitMode())
@@ -43,11 +42,7 @@ export function mountToolbar(
     labels.textContent = bar.labels[state.labelMode]
     labels.classList.toggle("active", state.labelMode !== "none")
     setToggle(coordinates, state.showCoordinates)
-    const equatorLegend = state.showCelestialEquator
-      ? ` · <span style="color:#c9b2ff">▱ ${bar.legendCelestialEquator}</span>`
-      : ""
-    legend.innerHTML = `${bar.legendFrame} · <span style="color:#56dfea">● ${escapeHtml(displayName(state.observer))}</span> · <span style="color:#80d9ce">▱ ${bar.legendGalacticPlane}</span>${equatorLegend} · <span style="white-space:nowrap">${bar.legendUnits(unit)}</span>`
-    hint.innerHTML = `${bar.axisHint}<br>${bar.planeHint(unit)}`
+    legend.innerHTML = `${bar.legendFrame} · <span style="color:#56dfea;white-space:nowrap">● ${bar.legendObserver} ${escapeHtml(displayName(state.observer))}</span>`
   }
   render(store.getState())
   store.subscribe((state, previous) => {
