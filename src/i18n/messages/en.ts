@@ -12,8 +12,8 @@ interface UnitText {
 export const en = {
   /** Static text of index.html, looked up through its data-i18n* attributes. */
   page: {
-    title: "Solar Neighborhood 3D Star Map",
-    kicker: "SOLAR NEIGHBORHOOD · INTERACTIVE ATLAS",
+    title: "Stellar Neighbors — 3D Star Map",
+    kicker: "STELLAR NEIGHBORS · 3D STAR MAP",
     heading: "The Solar Neighborhood<br />in 3D, 100 Light-Years Across",
     subtitle:
       "A cube centered on the Sun, drawn in galactic coordinates<br />with an optional celestial equator overlay",

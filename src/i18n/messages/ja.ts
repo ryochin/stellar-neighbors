@@ -2,8 +2,8 @@ import type { Messages } from "./en"
 
 export const ja: Messages = {
   page: {
-    title: "太陽近傍 3D 星図",
-    kicker: "太陽近傍 · インタラクティブ星図",
+    title: "Stellar Neighbors — 太陽近傍 3D 星図",
+    kicker: "STELLAR NEIGHBORS · 太陽近傍 3D 星図",
     heading: "太陽近傍の星々<br />一辺 100 光年の 3D マップ",
     subtitle: "銀河座標で描いた、太陽を中心とする立方体<br />天の赤道も重ねて表示できます",
     starCountCaption: "表示中の星・連星系",
