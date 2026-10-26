@@ -147,7 +147,7 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
   drawAxisTicks(dc, view)
 
   const { ctx } = dc
-  const names = ["Xg", "Yg", "Zg"]
+  const names = ["X", "Y", "Z"]
   const colors = ["#e5a5a0", "#a0deba", "#a4c6f0"]
   const tips: Vec3[] = [
     [53, 0, 0],
@@ -158,7 +158,7 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
   tips.forEach((tip, i) => {
     const q = proj(dc, tip)
     ctx.fillStyle = colors[i]
-    ctx.fillText(names[i], q.x - 7, q.y + 4)
+    ctx.fillText(names[i], q.x - 4, q.y + 4)
   })
   const unit = dc.i18n.t.units[view.unitMode].label
   ctx.fillStyle = "#89a5ba"
