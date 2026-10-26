@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:catalog": "tsx scripts/build-catalog.ts",
+    "build:wikipedia": "tsx scripts/build-wikipedia.ts",
     "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {

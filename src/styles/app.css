@@ -614,9 +614,13 @@ canvas {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.focus-button {
-  width: 100%;
+.detail-actions {
+  display: flex;
+  gap: 8px;
   margin-top: 10px;
+}
+.focus-button {
+  flex: 1;
   font-size: 12px;
   background: #1a5267;
   padding: 9px 12px;
@@ -636,4 +640,41 @@ canvas {
 .selected .kv .primary-distance {
   background: #17425780;
   box-shadow: inset 0 0 0 1px #306c81;
+}
+
+.wikipedia-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #366b84;
+  border-radius: 7px;
+  background: #153b50;
+  color: #bfeefa;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 10px;
+  text-decoration: none;
+}
+.wikipedia-link:hover {
+  background: #21566e;
+}
+.wikipedia-link[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.wikipedia-link[aria-disabled="true"]:hover {
+  background: #153b50;
+}
+/* The mark is black on transparent; a white tile like Wikipedia's favicon keeps it unmodified. */
+.wikipedia-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background: #fff;
+}
+.wikipedia-icon img {
+  width: 16px;
+  height: 16px;
 }

@@ -1,12 +1,15 @@
 import { MAX_OBSERVER_DISTANCE_LY, canObserveFrom, observerDistance } from "../astro/visibility"
 import { catalogIdList, otherDesignations } from "../catalog/aliases"
 import { displayName, secondaryName } from "../catalog/display-name"
+import { wikipediaUrl } from "../catalog/wikipedia"
 import type { I18n } from "../i18n/i18n"
 import { hasChanged, type AppActions, type AppState } from "../state/app-state"
 import type { Store } from "../state/store"
 import { byId, escapeHtml } from "./dom"
+// Wikipedia's "W" mark from Wikimedia Commons, unmodified (trademark policy allows it on links).
+import wikipediaIconUrl from "./icons/wikipedia-w.svg"
 
-const KEYS = ["selected", "observer", "unitMode"] as const
+const KEYS = ["selected", "observer", "unitMode", "wikipediaArticles"] as const
 
 export function mountDetailPanel(store: Store<AppState>, actions: AppActions, i18n: I18n): void {
   const t = i18n.t.detail
@@ -46,6 +49,13 @@ export function mountDetailPanel(store: Store<AppState>, actions: AppActions, i1
     const list = (items: string[]): string => items.map(escapeHtml).join(" · ")
     const designations = otherDesignations(star, i18n.locale)
     const catalogIds = catalogIdList(star.catalogIds)
+    const article = state.wikipediaArticles?.get(star.id)
+    // The wordmark stays "Wikipedia" in every locale, as the trademark policy asks.
+    const wikipediaContent = `<span class="wikipedia-icon"><img src="${wikipediaIconUrl}" alt=""></span>Wikipedia`
+    // A disabled look instead of no link, so the panel layout does not jump between stars.
+    const wikipediaLink = article
+      ? `<a class="wikipedia-link" href="${escapeHtml(wikipediaUrl(article))}" hreflang="${escapeHtml(article[0])}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(t.openWikipedia)}">${wikipediaContent}</a>`
+      : `<span class="wikipedia-link" aria-disabled="true" title="${escapeHtml(t.noWikipediaArticle)}">${wikipediaContent}</span>`
     panel.innerHTML = `<header><span class="dot" style="--c:${star.color}"></span>${escapeHtml(displayName(star))}</header>
 ${subtitle ? `<p>${subtitle}</p>` : ""}
 <div class="kv">
@@ -60,7 +70,10 @@ ${observingFromSun ? "" : `<div><small>${t.distanceFromSun}</small><strong>${fmt
 ${designations.length > 0 ? `<div class="wide aliases"><small>${t.designations}</small><strong>${list(designations)}</strong></div>` : ""}
 <div class="wide aliases"><small>${t.catalogIds}</small><strong>${catalogIds.length > 0 ? list(catalogIds) : "—"}</strong></div>
 </div>
-<button id="focusSelected" type="button" class="focus-button" ${atOrigin || !canTravel ? "disabled" : ""}>${buttonText}</button>`
+<div class="detail-actions">
+<button id="focusSelected" type="button" class="focus-button" ${atOrigin || !canTravel ? "disabled" : ""}>${buttonText}</button>
+${wikipediaLink}
+</div>`
   }
   render(store.getState())
   store.subscribe((state, previous) => {

@@ -92,6 +92,8 @@ export const ja: Messages = {
     designations: "符号",
     catalogIds: "カタログ番号",
     apparentMagnitude: "見かけの等級（地球から）",
+    openWikipedia: "Wikipedia の記事を新しいタブで開く",
+    noWikipediaArticle: "Wikipedia の記事はありません",
   },
   starList: {
     selectedSuffix: "（選択中）",

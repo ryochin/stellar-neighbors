@@ -1,9 +1,12 @@
 import "./styles/app.css"
 import namesJaUrl from "./catalog/data/names.ja.json?url"
 import catalogUrl from "./catalog/data/stars.json?url"
+import wikipediaEnUrl from "./catalog/data/wikipedia.en.json?url"
+import wikipediaJaUrl from "./catalog/data/wikipedia.ja.json?url"
 import { loadCatalog, loadLocalNames, rowToStar, withLocalNames } from "./catalog/loader"
 import { SUN_ROW } from "./catalog/sun"
 import type { Star } from "./catalog/types"
+import { loadWikipediaLinks } from "./catalog/wikipedia"
 import { applyDocumentTranslations } from "./i18n/document"
 import { createI18n } from "./i18n/i18n"
 import { resolveLocale, type Locale } from "./i18n/locales"
@@ -33,6 +36,9 @@ const RENDER_KEYS: readonly (keyof AppState)[] = [
 
 // English names are built into the catalog; other locales load their own names table.
 const LOCAL_NAMES_URLS: Partial<Record<Locale, string>> = { ja: namesJaUrl }
+
+// Each locale has its own links file, already falling back to English articles.
+const WIKIPEDIA_URLS: Record<Locale, string> = { en: wikipediaEnUrl, ja: wikipediaJaUrl }
 
 const locale = resolveLocale(location.search, navigator.languages)
 const i18n = createI18n(locale)
@@ -85,6 +91,17 @@ async function loadStars(): Promise<void> {
     actions.catalogLoaded(stars, catalog.meta)
   } catch (error) {
     actions.catalogFailed(error instanceof Error ? error.message : String(error))
+    return
+  }
+  if (!store.getState().wikipediaArticles) void loadWikipedia()
+}
+
+// Optional extra: loaded after the stars so it never delays them; without it the link stays disabled.
+async function loadWikipedia(): Promise<void> {
+  try {
+    actions.wikipediaLoaded(await loadWikipediaLinks(WIKIPEDIA_URLS[locale], locale))
+  } catch (error) {
+    console.warn("Wikipedia links unavailable:", error)
   }
 }
 

@@ -3,6 +3,7 @@ import { DEFAULT_MAX_RADIUS_LY, canObserveFrom, selectActiveStars } from "../ast
 import { rowToStar } from "../catalog/loader"
 import { SUN_ROW } from "../catalog/sun"
 import type { CatalogMeta, Star } from "../catalog/types"
+import type { WikipediaArticle } from "../catalog/wikipedia"
 import type { Store } from "./store"
 
 export type LabelMode = "major" | "all" | "none"
@@ -23,6 +24,8 @@ export interface AppState {
   searchQuery: string
   catalogMeta: CatalogMeta | null
   loadStatus: LoadStatus
+  /** Article per star id in the UI locale; null until the links file loads (or if it fails). */
+  wikipediaArticles: ReadonlyMap<string, WikipediaArticle> | null
 }
 
 const LABEL_ORDER: LabelMode[] = ["major", "all", "none"]
@@ -43,6 +46,7 @@ export function createInitialState(sun: Star = rowToStar(SUN_ROW)): AppState {
     searchQuery: "",
     catalogMeta: null,
     loadStatus: LOADING_STATUS,
+    wikipediaArticles: null,
   }
 }
 
@@ -117,6 +121,8 @@ export function createActions(store: Store<AppState>) {
         loadStatus: { kind: "ready" },
       }))
     },
+    wikipediaLoaded: (wikipediaArticles: ReadonlyMap<string, WikipediaArticle>): void =>
+      store.setState({ wikipediaArticles }),
     selectStar: (star: Star): void => store.setState({ selected: star }),
     setObserver,
     observeStar,

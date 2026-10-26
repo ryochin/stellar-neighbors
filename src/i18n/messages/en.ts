@@ -105,6 +105,8 @@ export const en = {
     designations: "Designations",
     catalogIds: "Catalog IDs",
     apparentMagnitude: "Apparent magnitude (from Earth)",
+    openWikipedia: "Open the Wikipedia article in a new tab",
+    noWikipediaArticle: "No Wikipedia article",
   },
   starList: {
     selectedSuffix: " (selected)",

@@ -34,8 +34,8 @@ export interface Catalog {
   stars: Star[]
 }
 
-type FetchFn = (input: string) => Promise<Response>
-const defaultFetch: FetchFn = (input) => fetch(input)
+export type FetchFn = (input: string) => Promise<Response>
+export const defaultFetch: FetchFn = (input) => fetch(input)
 
 // HYG writes a Bayer letter with a superscript index as "Pi-3".
 function toDesignation(row: CatalogRow): Designation | null {
@@ -105,7 +105,7 @@ export function parseCatalog(json: unknown): Catalog {
   return { meta: file.meta as CatalogMeta, stars: file.stars.map(rowToStar) }
 }
 
-async function fetchJson(url: string, fetchFn: FetchFn): Promise<unknown> {
+export async function fetchJson(url: string, fetchFn: FetchFn): Promise<unknown> {
   const response = await fetchFn(url)
   if (!response.ok) throw new Error(`Failed to fetch ${url} (HTTP ${response.status})`)
   return response.json()

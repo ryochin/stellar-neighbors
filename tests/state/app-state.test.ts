@@ -74,6 +74,13 @@ describe("app actions", () => {
     expect(store.getState().showCelestialEquator).toBe(false)
   })
 
+  it("has no Wikipedia articles until the links file loads", () => {
+    expect(store.getState().wikipediaArticles).toBeNull()
+    const articles = new Map([["sun", ["en", "Sun"] as const]])
+    actions.wikipediaLoaded(articles)
+    expect(store.getState().wikipediaArticles).toBe(articles)
+  })
+
   it("memoizes the active set for identical inputs", () => {
     const state = store.getState()
     expect(getActiveStars(state)).toBe(getActiveStars({ ...state, searchQuery: "x" }))

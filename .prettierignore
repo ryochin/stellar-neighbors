@@ -3,4 +3,5 @@ legacy
 docs
 data-src/cache
 src/catalog/data/stars.json
+src/catalog/data/wikipedia.*.json
 package-lock.json
