@@ -1,4 +1,4 @@
-{"version":3,"meta":{"source":"HYG v4.1 (commit 3bf37f4)","license":"CC BY-SA 4.0 — David Nash / astronexus HYG Database","generatedAt":"2026-10-25","maxDistanceLy":173.2},"fields":["id","name","gl","hip","hd","hr","bayer","flamsteed","variable","constellation","component","distLy","raH","decDeg","spec","mag","priority"],"stars":[
+{"version":3,"meta":{"source":"HYG v4.1 (commit 3bf37f4)","license":"CC BY-SA 4.0 — David Nash / astronexus HYG Database","generatedAt":"2026-10-26","maxDistanceLy":173.2},"fields":["id","name","gl","hip","hd","hr","bayer","flamsteed","variable","constellation","component","distLy","raH","decDeg","spec","mag","priority"],"stars":[
 ["hyg-0","Sun","",null,null,null,"",null,"","","",0,0,0,"G",-26.7,9],
 ["hyg-2","","",2,224690,null,"",null,"","","",156.43,0.000283,-19.49884,"K",9.27,0],
 ["hyg-18","","",18,null,null,"",null,"","","",146.193,0.003522,-4.05368,"K",11.03,0],
