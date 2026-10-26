@@ -30,7 +30,6 @@ export function mountStarList(store: Store<AppState>, actions: AppActions, i18n:
   const t = i18n.t.starList
   const list = byId("starlist")
   const search = byId<HTMLInputElement>("search")
-  const note = byId("focusedNote")
   const sortLabel = byId("distanceSortLabel")
 
   search.addEventListener("input", () => actions.setSearchQuery(search.value))
@@ -97,7 +96,6 @@ export function mountStarList(store: Store<AppState>, actions: AppActions, i18n:
       )
     }
     sortLabel.textContent = t.sortLabel(i18n.t.units[state.unitMode].label)
-    note.innerHTML = `${t.selectedNote} <strong>${selected ? escapeHtml(displayName(selected)) : "—"}</strong>&emsp;<span class="legend-item">${t.observerNote} ${escapeHtml(displayName(state.observer))}</span>`
     if (reveal) revealSelected(state)
   }
 

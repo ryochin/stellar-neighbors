@@ -64,9 +64,6 @@ export const ja: Messages = {
   dataPanel: {
     loading: "星のカタログを読み込んでいます…",
     loadFailed: (reason) => `星のカタログを読み込めませんでした: ${reason}`,
-    catalog: "カタログ",
-    ready: (source, count, observer, maxDistance) =>
-      `${source}: ${count} 個を表示 / 観測者: ${observer} / 最大距離 ${maxDistance}`,
   },
   detail: {
     empty: "表示する星がありません",
@@ -96,8 +93,6 @@ export const ja: Messages = {
     noMatches: "一致する星がありません",
     more: (count) => `ほか ${count} 件。名前・符号・カタログ番号で絞り込んでください。`,
     sortLabel: (unit) => `観測者からの距離順（${unit}）`,
-    selectedNote: "✦ 選択中:",
-    observerNote: "◎ 観測者:",
   },
   tooltip: {
     distanceFromHere: (distance) => `ここから ${distance}`,

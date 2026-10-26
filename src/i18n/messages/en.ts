@@ -77,9 +77,6 @@ export const en = {
   dataPanel: {
     loading: "Loading star catalog…",
     loadFailed: (reason: string): string => `Could not load the star catalog: ${reason}`,
-    catalog: "Catalog",
-    ready: (source: string, count: string, observer: string, maxDistance: string): string =>
-      `${source}: ${count} stars shown / observer: ${observer} / max distance ${maxDistance}`,
   },
   detail: {
     empty: "No stars to show",
@@ -110,8 +107,6 @@ export const en = {
     more: (count: string): string =>
       `${count} more. Narrow down by name, designation or catalog ID.`,
     sortLabel: (unit: string): string => `By distance from the observer (${unit})`,
-    selectedNote: "✦ Selected:",
-    observerNote: "◎ Observer:",
   },
   tooltip: {
     distanceFromHere: (distance: string): string => `${distance} from here`,

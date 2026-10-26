@@ -116,10 +116,8 @@ h1 {
   font-weight: 500;
 }
 .starlist {
-  min-height: 110px;
-  max-height: 250px;
   overflow-y: auto;
-  flex: 0 0 180px;
+  flex: 0 0 280px;
   scrollbar-width: thin;
   scrollbar-color: #32516a transparent;
   padding-right: 4px;
@@ -182,22 +180,6 @@ h1 {
 }
 .entry .distance {
   margin-left: auto;
-}
-.focused-note {
-  font-size: 11px;
-  color: #a9c6d8;
-  background: #0d2030;
-  border: 1px solid #25465d;
-  border-radius: 8px;
-  padding: 7px 10px;
-  line-height: 1.45;
-}
-.focused-note strong {
-  color: #a5f6fd;
-  font-weight: 750;
-}
-.focused-note .legend-item {
-  color: #f0cf9c;
 }
 .pinned-heading {
   font-size: 10px;
@@ -472,10 +454,15 @@ canvas {
   display: flex;
   align-items: center;
   gap: 7px;
+  cursor: pointer;
+  list-style: none;
   color: #c6e8ed;
   font-size: 12px;
   font-weight: 750;
   letter-spacing: 0.03em;
+}
+.panel .guide-title::-webkit-details-marker {
+  display: none;
 }
 .panel .guide-title:before {
   content: "";
@@ -485,6 +472,15 @@ canvas {
   background: #4bbdbb55;
   transform: rotate(-20deg);
   border-radius: 2px;
+}
+.panel .guide-title:after {
+  content: "▸";
+  margin-left: auto;
+  color: #70a9b8;
+  transition: transform 0.15s;
+}
+.panel[open] .guide-title:after {
+  transform: rotate(90deg);
 }
 .panel p {
   color: #99b6bf;

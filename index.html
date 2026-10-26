@@ -91,8 +91,10 @@
             are not shown.
           </div>
         </div>
-        <div class="panel">
-          <div class="guide-title" data-i18n="guideTitle">Coordinates and the galactic plane</div>
+        <details class="panel">
+          <summary class="guide-title" data-i18n="guideTitle">
+            Coordinates and the galactic plane
+          </summary>
           <p data-i18n="guideBody">
             The XYZ axes follow galactic coordinates: the XY plane is the galactic plane (latitude b
             = 0°) and the Z axis points to the north galactic pole. Turn on the celestial equator to
@@ -106,7 +108,7 @@
             ><span class="ce" data-i18n="keyCelestialEquator">Celestial equator</span
             ><span class="cn" data-i18n="keyNorthCelestialPole">North celestial pole</span>
           </div>
-        </div>
+        </details>
         <input
           id="search"
           class="search"
@@ -120,7 +122,6 @@
           <span data-i18n="starsHeading">Stars</span
           ><span id="distanceSortLabel">By distance from the observer (ly)</span>
         </div>
-        <div id="focusedNote" class="focused-note" aria-live="polite"></div>
         <div
           id="starlist"
           class="starlist"

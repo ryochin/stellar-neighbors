@@ -1,11 +1,10 @@
 import { CUBE_SPAN_LY } from "../astro/visibility"
-import { displayName } from "../catalog/display-name"
 import type { I18n } from "../i18n/i18n"
 import { getActiveStars, hasChanged, type AppActions, type AppState } from "../state/app-state"
 import type { Store } from "../state/store"
 import { byId, escapeHtml } from "./dom"
 
-const KEYS = ["stars", "observer", "unitMode", "maxRadius", "loadStatus", "catalogMeta"] as const
+const KEYS = ["stars", "observer", "unitMode", "maxRadius", "loadStatus"] as const
 
 export function mountDataPanel(
   store: Store<AppState>,
@@ -24,12 +23,11 @@ export function mountDataPanel(
   range.addEventListener("input", () => actions.setMaxRadius(Number(range.value)))
   retry.addEventListener("click", onRetry)
 
-  const statusText = (state: AppState, count: string, maxRadius: string): string => {
-    const { loadStatus } = state
+  // The star count already shows in the stat bar, so the status line is only for loading and errors.
+  const statusText = ({ loadStatus }: AppState): string => {
     if (loadStatus.kind === "loading") return t.dataPanel.loading
     if (loadStatus.kind === "error") return t.dataPanel.loadFailed(loadStatus.reason)
-    const source = state.catalogMeta?.source ?? t.dataPanel.catalog
-    return t.dataPanel.ready(source, count, displayName(state.observer), maxRadius)
+    return ""
   }
 
   const render = (state: AppState): void => {
@@ -42,7 +40,8 @@ export function mountDataPanel(
     rangeValue.textContent = maxRadius
     retry.hidden = state.loadStatus.kind !== "error"
     status.classList.toggle("warn", state.loadStatus.kind === "error")
-    status.textContent = statusText(state, count, maxRadius)
+    status.textContent = statusText(state)
+    status.hidden = state.loadStatus.kind === "ready"
   }
   render(store.getState())
   store.subscribe((state, previous) => {
