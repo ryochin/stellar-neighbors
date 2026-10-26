@@ -47,9 +47,7 @@ export const en = {
       '"View from another star" is a geometric comparison of distances between stars. It reflects parallax but not light travel time, proper motion or how bright the sky would really look.<br />Positions and distances: <a href="https://github.com/astronexus/HYG-Database" target="_blank" rel="noopener">HYG v4.1 (David Nash, CC BY-SA 4.0)</a>, processed (stars within about 173 ly of the Sun, with Japanese names added for major stars). The processed data is also provided under CC BY-SA 4.0. Galactic coordinate transform: <a href="https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu3ast/sec_cu3ast_intro/ssec_cu3ast_intro_tansforms.html" target="_blank" rel="noopener">ESA Gaia DR3</a>. HYG does not cover every star, and star sizes are schematic.',
     equatorTitle: "Show or hide the celestial equator (δ = 0°)",
     labelsTitle: "Cycle labels: major, all, none",
-    grid: "Grid",
-    gridTitle: "Show or hide the grid",
-    galacticTitle: "Show or hide the galactic plane (b = 0°)",
+    coordinatesTitle: "Show or hide the cube, the axes and the galactic plane",
     resetView: "↺ Reset view",
     resetViewTitle: "Reset the view and return to the Sun (R)",
     instructions:
@@ -63,8 +61,9 @@ export const en = {
   /** Name of the placeholder Sun shown until the catalog loads. */
   sun: "Sun",
   toolbar: {
-    celestialEquator: (on: boolean): string => `Celestial equator: ${on ? "ON" : "OFF"}`,
-    galacticPlane: (on: boolean): string => `Galactic plane: ${on ? "ON" : "OFF"}`,
+    // On/off shows in the button style and aria-pressed, so the toggle names carry no state.
+    celestialEquator: "Celestial equator",
+    coordinates: "Coordinates",
     units: (label: string): string => `Units: ${label}`,
     unitsTitle: (name: string): string => `Switch the distance unit (now: ${name})`,
     labels: {

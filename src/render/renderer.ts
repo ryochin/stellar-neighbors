@@ -22,8 +22,8 @@ export interface RenderView {
   selected: Star | null
   unitMode: UnitMode
   labelMode: LabelMode
-  showGrid: boolean
-  showGalacticPlane: boolean
+  /** The cube, its axes and the galactic plane with its pointers. */
+  showCoordinates: boolean
   showCelestialEquator: boolean
 }
 
@@ -54,8 +54,7 @@ export function buildRenderView(state: AppState): RenderView {
     selected: state.selected,
     unitMode: state.unitMode,
     labelMode: state.labelMode,
-    showGrid: state.showGrid,
-    showGalacticPlane: state.showGalacticPlane,
+    showCoordinates: state.showCoordinates,
     showCelestialEquator: state.showCelestialEquator,
   }
 }

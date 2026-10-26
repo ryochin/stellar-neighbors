@@ -149,56 +149,54 @@
       <div class="stage" id="stage">
         <div class="stage-top">
           <div class="toolbar">
-            <button
-              class="tool"
-              id="equator"
-              type="button"
-              title="Show or hide the celestial equator (δ = 0°)"
-              data-i18n-title="equatorTitle"
-            >
-              Celestial equator: OFF
-            </button>
-            <button class="tool active" id="units" type="button" title="Switch the distance unit">
-              Units: ly
-            </button>
-            <button
-              class="tool active"
-              id="labels"
-              type="button"
-              title="Cycle labels: major, all, none"
-              data-i18n-title="labelsTitle"
-            >
-              Labels: Major
-            </button>
-            <button
-              class="tool active"
-              id="grid"
-              type="button"
-              title="Show or hide the grid"
-              data-i18n="grid"
-              data-i18n-title="gridTitle"
-            >
-              Grid
-            </button>
-            <button
-              class="tool active"
-              id="galactic"
-              type="button"
-              title="Show or hide the galactic plane (b = 0°)"
-              data-i18n-title="galacticTitle"
-            >
-              Galactic plane: ON
-            </button>
-            <button
-              class="tool"
-              id="reset"
-              type="button"
-              title="Reset the view and return to the Sun (R)"
-              data-i18n="resetView"
-              data-i18n-title="resetViewTitle"
-            >
-              ↺ Reset view
-            </button>
+            <div class="tool-group">
+              <button
+                class="tool active"
+                id="labels"
+                type="button"
+                title="Cycle labels: major, all, none"
+                data-i18n-title="labelsTitle"
+              >
+                Labels: Major
+              </button>
+              <button class="tool active" id="units" type="button" title="Switch the distance unit">
+                Units: ly
+              </button>
+            </div>
+            <div class="tool-group">
+              <button
+                class="tool active"
+                id="coordinates"
+                type="button"
+                aria-pressed="true"
+                title="Show or hide the cube, the axes and the galactic plane"
+                data-i18n-title="coordinatesTitle"
+              >
+                Coordinates
+              </button>
+              <button
+                class="tool"
+                id="equator"
+                type="button"
+                aria-pressed="false"
+                title="Show or hide the celestial equator (δ = 0°)"
+                data-i18n-title="equatorTitle"
+              >
+                Celestial equator
+              </button>
+            </div>
+            <div class="tool-group">
+              <button
+                class="tool"
+                id="reset"
+                type="button"
+                title="Reset the view and return to the Sun (R)"
+                data-i18n="resetView"
+                data-i18n-title="resetViewTitle"
+              >
+                ↺ Reset view
+              </button>
+            </div>
           </div>
           <div class="legend"><div class="overlay-box" id="legend"></div></div>
         </div>

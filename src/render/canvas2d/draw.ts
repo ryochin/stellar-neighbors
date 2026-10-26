@@ -128,7 +128,7 @@ function drawAxisTicks(dc: DrawContext, view: RenderView): void {
 }
 
 export function drawCube(dc: DrawContext, view: RenderView): void {
-  if (!view.showGrid) return
+  if (!view.showCoordinates) return
   for (const v of [-H, -H / 2, 0, H / 2, H]) {
     line(dc, [v, -H, -H], [v, H, -H], "rgba(114,161,194,.115)", 0.7)
     line(dc, [-H, v, -H], [H, v, -H], "rgba(114,161,194,.115)", 0.7)
@@ -178,7 +178,7 @@ const planeOffset = (view: RenderView): number => -view.origin.gal[2]
 const planeCenter = (view: RenderView): Vec3 => [0, 0, planeOffset(view)]
 
 export function drawGalacticPlane(dc: DrawContext, view: RenderView): void {
-  if (!view.showGalacticPlane) return
+  if (!view.showCoordinates) return
   const { ctx } = dc
   const polygon = clipPlaneToCube([0, 0, 1], planeOffset(view), H)
   if (polygon.length >= 3) {
@@ -275,7 +275,7 @@ function annotatePoint(
 }
 
 export function drawGalacticAnnotations(dc: DrawContext, view: RenderView): void {
-  if (!view.showGalacticPlane) return
+  if (!view.showCoordinates) return
   const t = dc.i18n.t.canvas
   annotatePoint(dc, galacticVector(0, 45), t.galacticCenter, "#ffd19a", -10, -32)
   const pole = galacticVector(0, 43, 90)

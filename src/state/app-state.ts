@@ -18,8 +18,7 @@ export interface AppState {
   unitMode: UnitMode
   maxRadius: number
   labelMode: LabelMode
-  showGrid: boolean
-  showGalacticPlane: boolean
+  showCoordinates: boolean
   showCelestialEquator: boolean
   searchQuery: string
   catalogMeta: CatalogMeta | null
@@ -40,8 +39,7 @@ export function createInitialState(sun: Star = rowToStar(SUN_ROW)): AppState {
     unitMode: "ly",
     maxRadius: DEFAULT_MAX_RADIUS_LY,
     labelMode: "major",
-    showGrid: true,
-    showGalacticPlane: true,
+    showCoordinates: true,
     showCelestialEquator: false,
     searchQuery: "",
     catalogMeta: null,
@@ -139,9 +137,7 @@ export function createActions(store: Store<AppState>) {
       store.setState((s) => ({
         labelMode: LABEL_ORDER[(LABEL_ORDER.indexOf(s.labelMode) + 1) % LABEL_ORDER.length],
       })),
-    toggleGrid: (): void => store.setState((s) => ({ showGrid: !s.showGrid })),
-    toggleGalacticPlane: (): void =>
-      store.setState((s) => ({ showGalacticPlane: !s.showGalacticPlane })),
+    toggleCoordinates: (): void => store.setState((s) => ({ showCoordinates: !s.showCoordinates })),
     toggleCelestialEquator: (): void =>
       store.setState((s) => ({ showCelestialEquator: !s.showCelestialEquator })),
     setMaxRadius: (maxRadius: number): void => commit(() => ({ maxRadius })),

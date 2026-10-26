@@ -28,8 +28,7 @@ const RENDER_KEYS: readonly (keyof AppState)[] = [
   "selected",
   "unitMode",
   "labelMode",
-  "showGrid",
-  "showGalacticPlane",
+  "showCoordinates",
   "showCelestialEquator",
   "maxRadius",
 ]

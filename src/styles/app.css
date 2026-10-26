@@ -368,20 +368,26 @@ canvas {
   z-index: 1;
   display: flex;
   flex-direction: row-reverse;
-  flex-wrap: wrap;
   align-items: flex-start;
   gap: 8px 24px;
   pointer-events: none;
 }
+/* The toolbar takes what the legend leaves and wraps its groups downward, so the legend keeps the top row. */
 .toolbar {
+  flex: 1 1 0;
   display: flex;
-  gap: 7px;
+  gap: 7px 16px;
   flex-wrap: wrap;
   justify-content: flex-end;
-  max-width: min(78%, 650px);
   pointer-events: auto;
 }
+/* Buttons of one kind stay on one line together; the wider toolbar gap separates the groups. */
+.tool-group {
+  display: flex;
+  gap: 7px;
+}
 .tool {
+  white-space: nowrap;
   background: #101e30dd;
   color: #c6deee;
   font: inherit;
@@ -434,8 +440,8 @@ canvas {
   max-width: 40vw;
 }
 .legend {
-  flex: 1 1 260px;
-  min-width: 0;
+  flex: 0 1 auto;
+  min-width: 200px;
   margin-top: 3px;
   color: #9ec4dc;
   font-size: 11px;
@@ -544,13 +550,13 @@ canvas {
     padding: 18px;
     max-height: 650px;
   }
+  /* Legend on its own row, the buttons below it, instead of a tall column of buttons. */
   .stage-top {
     top: 10px;
     left: 14px;
     right: 10px;
-  }
-  .toolbar {
-    max-width: 82%;
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
   .tool {
     padding: 6px 8px;

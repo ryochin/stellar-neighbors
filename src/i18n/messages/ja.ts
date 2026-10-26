@@ -36,9 +36,7 @@ export const ja: Messages = {
       '「ほかの星から見る」は、星どうしの距離を幾何学的に比べるものです。視差は反映していますが、光の到達時間、固有運動、実際の空の明るさは反映していません。<br />位置と距離: <a href="https://github.com/astronexus/HYG-Database" target="_blank" rel="noopener">HYG v4.1（David Nash, CC BY-SA 4.0）</a>を加工して使用（太陽から約 173 光年以内の星を抽出し、主な星に日本語名を追加）。加工したデータも CC BY-SA 4.0 で提供します。銀河座標への変換: <a href="https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu3ast/sec_cu3ast_intro/ssec_cu3ast_intro_tansforms.html" target="_blank" rel="noopener">ESA Gaia DR3</a>。HYG はすべての星を網羅しているわけではありません。星の大きさは模式的なものです。',
     equatorTitle: "天の赤道（δ = 0°）の表示を切り替え",
     labelsTitle: "ラベルを切り替え: 主な星、すべて、なし",
-    grid: "グリッド",
-    gridTitle: "グリッドの表示を切り替え",
-    galacticTitle: "銀河面（b = 0°）の表示を切り替え",
+    coordinatesTitle: "立方体・座標軸・銀河面の表示を切り替え",
     resetView: "↺ 視点をリセット",
     resetViewTitle: "視点を戻し、観測者を太陽に戻す（R）",
     instructions:
@@ -51,8 +49,8 @@ export const ja: Messages = {
   },
   sun: "太陽",
   toolbar: {
-    celestialEquator: (on) => `天の赤道: ${on ? "表示" : "非表示"}`,
-    galacticPlane: (on) => `銀河面: ${on ? "表示" : "非表示"}`,
+    celestialEquator: "天の赤道",
+    coordinates: "座標系",
     units: (label) => `単位: ${label}`,
     unitsTitle: (name) => `距離の単位を切り替え（現在: ${name}）`,
     labels: {

@@ -8,8 +8,7 @@ import { byId, escapeHtml } from "./dom"
 const KEYS = [
   "unitMode",
   "labelMode",
-  "showGrid",
-  "showGalacticPlane",
+  "showCoordinates",
   "showCelestialEquator",
   "observer",
 ] as const
@@ -23,30 +22,27 @@ export function mountToolbar(
   const equator = byId("equator")
   const units = byId("units")
   const labels = byId("labels")
-  const grid = byId("grid")
-  const galactic = byId("galactic")
+  const coordinates = byId("coordinates")
   const legend = byId("legend")
   const hint = byId("hint")
 
   equator.addEventListener("click", () => actions.toggleCelestialEquator())
   units.addEventListener("click", () => actions.cycleUnitMode())
   labels.addEventListener("click", () => actions.cycleLabelMode())
-  grid.addEventListener("click", () => actions.toggleGrid())
-  galactic.addEventListener("click", () => actions.toggleGalacticPlane())
+  coordinates.addEventListener("click", () => actions.toggleCoordinates())
   byId("reset").addEventListener("click", () => camera.resetView())
+  equator.textContent = t.toolbar.celestialEquator
+  coordinates.textContent = t.toolbar.coordinates
 
   const render = (state: AppState): void => {
     const { label: unit, name: unitName } = t.units[state.unitMode]
     const bar = t.toolbar
-    equator.textContent = bar.celestialEquator(state.showCelestialEquator)
-    equator.classList.toggle("active", state.showCelestialEquator)
+    setToggle(equator, state.showCelestialEquator)
     units.textContent = bar.units(unit)
     units.title = bar.unitsTitle(unitName)
     labels.textContent = bar.labels[state.labelMode]
     labels.classList.toggle("active", state.labelMode !== "none")
-    grid.classList.toggle("active", state.showGrid)
-    galactic.textContent = bar.galacticPlane(state.showGalacticPlane)
-    galactic.classList.toggle("active", state.showGalacticPlane)
+    setToggle(coordinates, state.showCoordinates)
     const equatorLegend = state.showCelestialEquator
       ? ` · <span style="color:#c9b2ff">▱ ${bar.legendCelestialEquator}</span>`
       : ""
@@ -57,4 +53,9 @@ export function mountToolbar(
   store.subscribe((state, previous) => {
     if (hasChanged(state, previous, KEYS)) render(state)
   })
+}
+
+function setToggle(button: HTMLElement, on: boolean): void {
+  button.classList.toggle("active", on)
+  button.setAttribute("aria-pressed", String(on))
 }
