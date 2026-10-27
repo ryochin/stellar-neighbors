@@ -21,8 +21,11 @@ import {
   drawGalacticPlane,
   drawLabels,
   drawStars,
+  layoutLabels,
+  type DrawContext,
   type ProjectedStar,
 } from "./draw"
+import { advanceLabelFades, fadeElapsedMs, type LabelOpacities } from "./label-fade"
 
 const PICK_RADIUS_PX = 15
 const DRAG_THRESHOLD_PX = 4
@@ -46,6 +49,8 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   let angles: CameraAngles = defaultAngles()
   let viewport = { width: 0, height: 0 }
   let projected: ProjectedStar[] = []
+  let labelOpacities: LabelOpacities = new Map()
+  let lastLabelFadeMs: number | null = null
   // The camera and the observer move animate independently but share one frame loop.
   let animationFrame: number | null = null
   let cameraTransition: { from: CameraAngles; to: CameraAngles; start: number | null } | null = null
@@ -81,9 +86,26 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
     drawGalacticPlane(dc, shown)
     drawCelestialEquator(dc, shown)
     projected = drawStars(dc, shown)
-    drawLabels(dc, shown, projected)
+    drawFadingLabels(dc, shown)
     drawGalacticAnnotations(dc, shown)
     drawCelestialEquatorAnnotations(dc, shown)
+  }
+
+  // Labels fade in and out; the frame loop keeps running until every fade has finished.
+  function drawFadingLabels(dc: DrawContext, shown: RenderView): void {
+    const now: number = performance.now()
+    const elapsed: number = fadeElapsedMs(lastLabelFadeMs, now, prefersReducedMotion())
+    const present = new Set<string>(projected.map((p) => p.item.star.id))
+    const fade = advanceLabelFades(
+      labelOpacities,
+      layoutLabels(dc, shown, projected),
+      present,
+      elapsed,
+    )
+    labelOpacities = fade.opacities
+    lastLabelFadeMs = fade.animating ? now : null
+    drawLabels(dc, shown, projected, labelOpacities)
+    if (fade.animating) requestTick()
   }
 
   const prefersReducedMotion = (): boolean =>

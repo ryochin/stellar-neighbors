@@ -12,6 +12,7 @@ import type { I18n } from "../../i18n/i18n"
 import { clipPlaneToCube } from "../geometry"
 import type { RenderStar, RenderView } from "../renderer"
 import { project, type CameraAngles, type Projected, type Viewport } from "./camera"
+import type { LabelOpacities } from "./label-fade"
 
 const TAU = Math.PI * 2
 const MAX_LABELS = 240
@@ -346,11 +347,20 @@ export function drawStars(dc: DrawContext, view: RenderView): ProjectedStar[] {
   return projected
 }
 
-export function drawLabels(dc: DrawContext, view: RenderView, projected: ProjectedStar[]): void {
+const LABEL_FONT = `11px ${FONT_FAMILY}`
+const labelPosition = (p: ProjectedStar): [number, number] => [p.x + 10, p.y - 11]
+
+/** Picks the stars whose labels fit, by rank and without overlaps; returns their IDs. */
+export function layoutLabels(
+  dc: DrawContext,
+  view: RenderView,
+  projected: ProjectedStar[],
+): Set<string> {
   const { ctx, viewport } = dc
   const { selected, observer, labelMode } = view
+  const shown = new Set<string>()
   // "None" hides every star label, including the pinned selected and observer labels.
-  if (labelMode === "none") return
+  if (labelMode === "none") return shown
   const rank = (p: ProjectedStar): number => {
     const star = p.item.star
     if (star === selected) return 100
@@ -365,15 +375,12 @@ export function drawLabels(dc: DrawContext, view: RenderView, projected: Project
     .sort((a, b) => rank(b) - rank(a))
 
   const boxes: { x: number; y: number; w: number; h: number }[] = []
-  ctx.font = `11px ${FONT_FAMILY}`
-  ctx.textBaseline = "middle"
+  ctx.font = LABEL_FONT
   for (const p of candidates) {
     if (boxes.length >= MAX_LABELS) break
     const star = p.item.star
-    const label = displayName(star)
-    const textWidth = ctx.measureText(label).width
-    const x = p.x + 10
-    const y = p.y - 11
+    const textWidth = ctx.measureText(displayName(star)).width
+    const [x, y] = labelPosition(p)
     const box = { x, y: y - 7, w: textWidth + 7, h: 17 }
     if (x + textWidth > viewport.width - 5 || x < 0 || y < 12 || y > viewport.height - 9) continue
     const pinned = star === selected || star === observer
@@ -386,12 +393,36 @@ export function drawLabels(dc: DrawContext, view: RenderView, projected: Project
     )
     if (clash && !pinned) continue
     boxes.push(box)
-    ctx.lineWidth = 3
-    ctx.strokeStyle = "#081321"
+    shown.add(star.id)
+  }
+  return shown
+}
+
+/** Draws every label that is shown or still fading, at its star's current position. */
+export function drawLabels(
+  dc: DrawContext,
+  view: RenderView,
+  projected: ProjectedStar[],
+  opacities: LabelOpacities,
+): void {
+  const { ctx } = dc
+  const { selected, observer } = view
+  ctx.font = LABEL_FONT
+  ctx.textBaseline = "middle"
+  ctx.lineWidth = 3
+  ctx.strokeStyle = "#081321"
+  for (const p of projected) {
+    const star = p.item.star
+    const opacity = opacities.get(star.id)
+    if (opacity === undefined) continue
+    const label = displayName(star)
+    const [x, y] = labelPosition(p)
+    ctx.globalAlpha = opacity
     ctx.strokeText(label, x, y)
     ctx.fillStyle = star === selected ? "#a0f3ff" : star === observer ? "#69eeef" : "#d3e5f5"
     ctx.fillText(label, x, y)
   }
+  ctx.globalAlpha = 1
 }
 
 // Where the equator label sits: a point on the equator, away from the galactic plane label.
