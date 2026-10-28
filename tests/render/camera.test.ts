@@ -30,6 +30,15 @@ describe("project", () => {
     expect(project(angles, viewport, [0, 0, 10]).y).toBeCloseTo(400 - 10 * scale, 9)
   })
 
+  it("draws the cube smaller on short (landscape phone) stages to leave room for the toolbar", () => {
+    const angles = { yaw: 0, pitch: 0, zoom: 1 }
+    const short = { width: 844, height: 390 }
+    // min(844 / 150, 390 / 160)
+    expect(project(angles, short, [0, 0, 10]).y).toBeCloseTo(195 - 10 * (390 / 160), 9)
+    const tall = { width: 844, height: 501 }
+    expect(project(angles, tall, [0, 0, 10]).y).toBeCloseTo(250.5 - 10 * (501 / 144), 9)
+  })
+
   it("keeps the axes right-handed (screen right × up = toward the viewer)", () => {
     for (const angles of [
       { yaw: 0, pitch: 0, zoom: 1 },

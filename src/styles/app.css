@@ -535,7 +535,8 @@ canvas {
 .panel .key .cn:before {
   color: #d2bcff;
 }
-@media (max-width: 720px) {
+/* Phones, portrait or landscape (short and touch, unlike iPads and short desktop windows). */
+@media (max-width: 720px), (max-height: 500px) and (pointer: coarse) {
   .app {
     height: auto;
     min-height: 100vh;
@@ -575,6 +576,24 @@ canvas {
   }
   .star-sheet:not([hidden]) {
     display: block;
+  }
+}
+/* Landscape phones: the stage fills the screen and the side panel follows below it. */
+@media (max-height: 500px) and (pointer: coarse) {
+  .stage {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+  }
+  /* The width fits the legend and the buttons on one row, which keeps them off the cube. */
+  .stage-top {
+    flex-direction: row-reverse;
+    align-items: flex-start;
+  }
+  /* As wide as on a portrait phone, so the sheet leaves the middle of the cube in view. */
+  .star-sheet {
+    right: auto;
+    width: 360px;
   }
 }
 

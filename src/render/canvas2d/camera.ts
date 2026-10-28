@@ -28,6 +28,10 @@ const PERSPECTIVE_DISTANCE = 240
 // (phone) stages to the width, where the rotated cube needs more room; 150 picked by the user.
 const VIEW_SPAN_X = 150
 const VIEW_SPAN_Y = 144
+// Short (landscape phone) stages leave room for the toolbar above the cube; 160 picked by the
+// user. Desktop stages never get this short (.app has a 540px minimum height).
+const SHORT_STAGE_MAX_HEIGHT = 500
+const SHORT_VIEW_SPAN_Y = 160
 
 // Small enough to keep the axis labels clear of the toolbar and legend on a 1440px screen.
 const DEFAULT_ZOOM = 0.95
@@ -78,7 +82,8 @@ export function project(angles: CameraAngles, viewport: Viewport, [x, y, z]: Vec
   const up = z * cp - yy * sp
   const depth = yy * cp + z * sp
   const f = PERSPECTIVE_DISTANCE / (PERSPECTIVE_DISTANCE - depth)
-  const scale = Math.min(viewport.width / VIEW_SPAN_X, viewport.height / VIEW_SPAN_Y) * angles.zoom
+  const spanY: number = viewport.height <= SHORT_STAGE_MAX_HEIGHT ? SHORT_VIEW_SPAN_Y : VIEW_SPAN_Y
+  const scale = Math.min(viewport.width / VIEW_SPAN_X, viewport.height / spanY) * angles.zoom
   return {
     x: viewport.width * 0.51 + xx * scale * f,
     y: viewport.height * 0.5 - up * scale * f,
