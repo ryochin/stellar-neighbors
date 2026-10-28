@@ -108,6 +108,10 @@ export const en = {
       `${count} more. Narrow down by name, designation or catalog ID.`,
     sortLabel: (unit: string): string => `By distance from the observer (${unit})`,
   },
+  sheet: {
+    details: "Details",
+    close: "Close",
+  },
   tooltip: {
     distanceFromHere: (distance: string): string => `${distance} from here`,
   },

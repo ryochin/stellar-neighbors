@@ -2,6 +2,7 @@ import { formatDeclination, formatRightAscension } from "../astro/sexagesimal"
 import { MAX_OBSERVER_DISTANCE_LY, canObserveFrom, observerDistance } from "../astro/visibility"
 import { catalogIdList, otherDesignations } from "../catalog/aliases"
 import { displayName, secondaryName } from "../catalog/display-name"
+import type { Star } from "../catalog/types"
 import { wikipediaUrl } from "../catalog/wikipedia"
 import type { I18n } from "../i18n/i18n"
 import { hasChanged, type AppActions, type AppState } from "../state/app-state"
@@ -11,6 +12,22 @@ import { byId, escapeHtml } from "./dom"
 import wikipediaIconUrl from "./icons/wikipedia-w.svg"
 
 const KEYS = ["selected", "observer", "unitMode", "wikipediaArticles"] as const
+
+export interface ObserveButton {
+  text: string
+  disabled: boolean
+}
+
+/** Label and state of the "observe from this star" button, shared with the star sheet. */
+export function observeButton(star: Star, state: AppState, i18n: I18n): ObserveButton {
+  const t = i18n.t.detail
+  if (star === state.observer) return { text: t.observingFromHere, disabled: true }
+  if (!canObserveFrom(star)) {
+    const limit: string = i18n.formatDistance(MAX_OBSERVER_DISTANCE_LY, state.unitMode)
+    return { text: t.outOfRange(limit), disabled: true }
+  }
+  return { text: t.observeFromHere, disabled: false }
+}
 
 export function mountDetailPanel(store: Store<AppState>, actions: AppActions, i18n: I18n): void {
   const t = i18n.t.detail
@@ -28,13 +45,8 @@ export function mountDetailPanel(store: Store<AppState>, actions: AppActions, i1
     }
     const { observer, unitMode } = state
     const atOrigin = star === observer
-    const canTravel = canObserveFrom(star)
     const fmt = (ly: number): string => i18n.formatDistance(ly, unitMode)
-    const buttonText = atOrigin
-      ? t.observingFromHere
-      : !canTravel
-        ? t.outOfRange(fmt(MAX_OBSERVER_DISTANCE_LY))
-        : t.observeFromHere
+    const button: ObserveButton = observeButton(star, state, i18n)
     const english = secondaryName(star)
     const subtitle = [
       english && `<span lang="en">${escapeHtml(english)}</span>`,
@@ -72,7 +84,7 @@ ${designations.length > 0 ? `<div class="wide aliases"><small>${t.designations}<
 <div class="wide aliases"><small>${t.catalogIds}</small><strong>${catalogIds.length > 0 ? list(catalogIds) : "—"}</strong></div>
 </div>
 <div class="detail-actions">
-<button id="focusSelected" type="button" class="focus-button" ${atOrigin || !canTravel ? "disabled" : ""}>${buttonText}</button>
+<button id="focusSelected" type="button" class="focus-button" ${button.disabled ? "disabled" : ""}>${button.text}</button>
 ${wikipediaLink}
 </div>`
   }

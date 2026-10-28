@@ -94,6 +94,10 @@ export const ja: Messages = {
     more: (count) => `ほか ${count} 件。名前・符号・カタログ番号で絞り込んでください。`,
     sortLabel: (unit) => `観測者からの距離順（${unit}）`,
   },
+  sheet: {
+    details: "詳細",
+    close: "閉じる",
+  },
   tooltip: {
     distanceFromHere: (distance) => `ここから ${distance}`,
   },

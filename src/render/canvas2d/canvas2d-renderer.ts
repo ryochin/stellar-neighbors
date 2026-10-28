@@ -198,8 +198,9 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
     const rect = stageElement().getBoundingClientRect()
     return [e.clientX - rect.left, e.clientY - rect.top]
   }
+  // Panels laid over the stage opt out with data-no-stage-input, so pressing them never rotates the map.
   const isOnControl = (e: Event): boolean =>
-    e.target instanceof Element && e.target.closest("button") !== null
+    e.target instanceof Element && e.target.closest("button, [data-no-stage-input]") !== null
 
   function pointerSpread(): number {
     const [a, b] = [...pointers.values()]

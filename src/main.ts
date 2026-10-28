@@ -19,6 +19,7 @@ import { mountDetailPanel } from "./ui/detail-panel"
 import { byId } from "./ui/dom"
 import { mountObserverBox } from "./ui/observer-box"
 import { mountStarList } from "./ui/star-list"
+import { mountStarSheet } from "./ui/star-sheet"
 import { mountToolbar } from "./ui/toolbar"
 import { createTooltip } from "./ui/tooltip"
 
@@ -59,6 +60,7 @@ const renderer = createCanvas2dRenderer(
       actions.selectStar(star)
       // Re-clicking the selected star leaves the state unchanged, so reveal it explicitly like legacy.
       starList.revealSelected()
+      starSheet.open()
     },
     onStarHover: (star, x, y) => tooltip.show(star, x, y),
     onStarDoubleClick: (star) => actions.observeStar(star),
@@ -68,6 +70,7 @@ const renderer = createCanvas2dRenderer(
 
 // Back to the start-up view: observe from the Sun, select it and restore the camera.
 function resetAll(): void {
+  starSheet.close()
   actions.returnToSun()
   renderer.resetView()
 }
@@ -109,6 +112,7 @@ mountObserverBox(store, actions)
 mountDataPanel(store, actions, () => void loadStars(), i18n)
 const starList = mountStarList(store, actions, i18n)
 mountDetailPanel(store, actions, i18n)
+const starSheet = mountStarSheet(store, actions, i18n)
 
 const search = byId<HTMLInputElement>("search")
 window.addEventListener("keydown", (e) => {
