@@ -4,11 +4,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# DRY_RUN from the command line wins over .env, so `DRY_RUN=1 npm run deploy` never uploads.
+cli_dry_run="${DRY_RUN:-}"
 if [ -f .env ]; then
   set -a
   . ./.env
   set +a
 fi
+DRY_RUN="${cli_dry_run:-${DRY_RUN:-}}"
 
 : "${S3_BUCKET:?S3_BUCKET is required (e.g. s3://my-bucket)}"
 
