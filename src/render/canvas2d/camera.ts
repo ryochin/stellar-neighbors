@@ -37,6 +37,11 @@ export function galacticPoleAngles(): CameraAngles {
   return { yaw: 0, pitch: Math.PI / 2, zoom: 1.08 }
 }
 
+/** Multiplies the zoom by `factor` (wheel or pinch), kept within MIN_ZOOM..MAX_ZOOM. */
+export function scaleZoom(angles: CameraAngles, factor: number): CameraAngles {
+  return { ...angles, zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, angles.zoom * factor)) }
+}
+
 export function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
 }

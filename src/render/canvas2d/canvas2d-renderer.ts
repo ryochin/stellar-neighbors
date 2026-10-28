@@ -3,13 +3,12 @@ import type { I18n } from "../../i18n/i18n"
 import { transitionView } from "../observer-transition"
 import type { CubeOrigin, RenderView, RendererCallbacks, StarRenderer } from "../renderer"
 import {
-  MAX_ZOOM,
-  MIN_ZOOM,
   PITCH_LIMIT,
   defaultAngles,
   easeInOutCubic,
   galacticPoleAngles,
   interpolateAngles,
+  scaleZoom,
   type CameraAngles,
 } from "./camera"
 import {
@@ -71,6 +70,9 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
     lastX: 0,
     lastY: 0,
   }
+  // Pressed pointers by id; two of them pinch to zoom. `pinchSpread` is null outside a pinch.
+  const pointers = new Map<number, { x: number; y: number }>()
+  let pinchSpread: number | null = null
 
   const stageElement = (): HTMLElement => {
     if (!stage) throw new Error("renderer is not mounted")
@@ -199,10 +201,27 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   const isOnControl = (e: Event): boolean =>
     e.target instanceof Element && e.target.closest("button") !== null
 
+  function pointerSpread(): number {
+    const [a, b] = [...pointers.values()]
+    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0
+  }
+
   function onPointerDown(e: PointerEvent): void {
     if (isOnControl(e)) return
     stopCameraAnimation()
     const [x, y] = pointerPosition(e)
+    // A new primary pointer means every earlier one has ended, even if its pointerup got lost.
+    if (e.isPrimary) pointers.clear()
+    pointers.set(e.pointerId, { x, y })
+    stageElement().setPointerCapture(e.pointerId)
+    if (pointers.size === 2) {
+      // A second finger turns the drag into a pinch; the press can no longer be a tap.
+      pinchSpread = pointerSpread()
+      drag.active = false
+      drag.moved = true
+      return
+    }
+    if (pointers.size > 2) return
     Object.assign(drag, {
       active: true,
       moved: false,
@@ -213,12 +232,19 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
       lastY: y,
     })
     stageElement().classList.add("dragging")
-    stageElement().setPointerCapture(e.pointerId)
     callbacks.onStarHover(null, 0, 0)
   }
 
   function onPointerMove(e: PointerEvent): void {
     const [x, y] = pointerPosition(e)
+    if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x, y })
+    if (pinchSpread !== null) {
+      const spread: number = pointerSpread()
+      if (pinchSpread > 0 && spread > 0) angles = scaleZoom(angles, spread / pinchSpread)
+      pinchSpread = spread
+      draw()
+      return
+    }
     if (drag.active) {
       if (Math.hypot(x - drag.startX, y - drag.startY) > DRAG_THRESHOLD_PX) drag.moved = true
       angles = {
@@ -231,6 +257,8 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
       draw()
       return
     }
+    // A finger left over from a pinch neither rotates nor hovers.
+    if (pointers.size > 0) return
     const star = starAt(x, y)
     stageElement().style.cursor = star ? "pointer" : "grab"
     callbacks.onStarHover(star, x, y)
@@ -242,13 +270,19 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
       const star = starAt(x, y)
       if (star) callbacks.onStarClick(star)
     }
-    drag.active = false
-    stageElement().classList.remove("dragging")
+    releasePointer(e)
   }
 
-  function onPointerCancel(): void {
+  function releasePointer(e: PointerEvent): void {
+    pointers.delete(e.pointerId)
+    endPress()
+  }
+
+  function endPress(): void {
+    // Lifting a third finger restarts the pinch from the remaining pair so the zoom does not jump.
+    pinchSpread = pointers.size >= 2 ? pointerSpread() : null
     drag.active = false
-    stageElement().classList.remove("dragging")
+    if (pointers.size === 0) stageElement().classList.remove("dragging")
   }
 
   function onPointerLeave(): void {
@@ -258,10 +292,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   function onWheel(e: WheelEvent): void {
     e.preventDefault()
     stopCameraAnimation()
-    angles = {
-      ...angles,
-      zoom: clamp(angles.zoom * Math.exp(-e.deltaY * 0.0011), MIN_ZOOM, MAX_ZOOM),
-    }
+    angles = scaleZoom(angles, Math.exp(-e.deltaY * 0.0011))
     draw()
   }
 
@@ -292,7 +323,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
       container.addEventListener("pointerdown", onPointerDown)
       container.addEventListener("pointermove", onPointerMove)
       container.addEventListener("pointerup", onPointerUp)
-      container.addEventListener("pointercancel", onPointerCancel)
+      container.addEventListener("pointercancel", releasePointer)
       container.addEventListener("pointerleave", onPointerLeave)
       container.addEventListener("wheel", onWheel, { passive: false })
       container.addEventListener("dblclick", onDoubleClick)
@@ -318,13 +349,14 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
       container.removeEventListener("pointerdown", onPointerDown)
       container.removeEventListener("pointermove", onPointerMove)
       container.removeEventListener("pointerup", onPointerUp)
-      container.removeEventListener("pointercancel", onPointerCancel)
+      container.removeEventListener("pointercancel", releasePointer)
       container.removeEventListener("pointerleave", onPointerLeave)
       container.removeEventListener("wheel", onWheel)
       container.removeEventListener("dblclick", onDoubleClick)
       window.removeEventListener("resize", resize)
       resizeObserver?.disconnect()
-      onPointerCancel()
+      pointers.clear()
+      endPress()
       container.style.cursor = ""
       callbacks.onStarHover(null, 0, 0)
       canvas.remove()

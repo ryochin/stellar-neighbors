@@ -5,8 +5,11 @@ import {
   easeInOutCubic,
   galacticPoleAngles,
   interpolateAngles,
+  MAX_ZOOM,
+  MIN_ZOOM,
   PITCH_LIMIT,
   project,
+  scaleZoom,
 } from "../../src/render/canvas2d/camera"
 
 const viewport = { width: 1000, height: 800 }
@@ -134,5 +137,18 @@ describe("interpolateAngles", () => {
   it("changes the zoom at a constant ratio", () => {
     const mid = interpolateAngles({ ...from, zoom: 1 }, { ...to, zoom: 4 }, 0.5)
     expect(mid.zoom).toBeCloseTo(2, 12)
+  })
+})
+
+describe("scaleZoom", () => {
+  it("multiplies the zoom and keeps the angles", () => {
+    const angles = { yaw: 0.4, pitch: -0.2, zoom: 2 }
+    expect(scaleZoom(angles, 1.5)).toEqual({ yaw: 0.4, pitch: -0.2, zoom: 3 })
+  })
+
+  it("clamps the zoom to MIN_ZOOM..MAX_ZOOM", () => {
+    const angles = { yaw: 0, pitch: 0, zoom: 1 }
+    expect(scaleZoom(angles, 100).zoom).toBe(MAX_ZOOM)
+    expect(scaleZoom(angles, 0.01).zoom).toBe(MIN_ZOOM)
   })
 })
