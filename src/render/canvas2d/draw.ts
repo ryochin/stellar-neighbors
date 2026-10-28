@@ -15,6 +15,31 @@ import { project, type CameraAngles, type Projected, type Viewport } from "./cam
 import type { LabelOpacities } from "./label-fade"
 
 const TAU = Math.PI * 2
+// Star sizes are fixed in CSS px while the cube shrinks with the stage, so small stages draw smaller
+// stars. Values picked by the user on a 390px-wide phone; full size from a 700px short side.
+const SMALL_STAGE_PX = 390
+const FULL_SIZE_STAGE_PX = 700
+const SMALL_STAGE_STAR_SCALE = 0.75
+const SMALL_STAGE_HALO_SCALE = 0.7
+
+export interface StarSizeScales {
+  /** Multiplies the star radius. */
+  star: number
+  /** Multiplies the halo radius on top of `star`. */
+  halo: number
+}
+
+export function starSizeScales(viewport: Viewport): StarSizeScales {
+  const shortSide: number = Math.min(viewport.width, viewport.height)
+  const t: number = Math.min(
+    1,
+    Math.max(0, (shortSide - SMALL_STAGE_PX) / (FULL_SIZE_STAGE_PX - SMALL_STAGE_PX)),
+  )
+  return {
+    star: SMALL_STAGE_STAR_SCALE + (1 - SMALL_STAGE_STAR_SCALE) * t,
+    halo: SMALL_STAGE_HALO_SCALE + (1 - SMALL_STAGE_HALO_SCALE) * t,
+  }
+}
 const MAX_LABELS = 240
 const H = CUBE_HALF_LY
 // The canvas does not inherit the page font, so list the Japanese fonts of app.css as well.
@@ -315,21 +340,23 @@ export function drawStars(dc: DrawContext, view: RenderView): ProjectedStar[] {
     ctx.setLineDash([])
   }
 
+  const sizeScales: StarSizeScales = starSizeScales(dc.viewport)
   // Far to near so nearer stars paint over farther ones.
   for (const p of [...projected].sort((a, b) => a.depth - b.depth)) {
     const star = p.item.star
     const bright = star.priority >= 7 ? 3.4 : star.priority >= 4 ? 2.6 : 1.9
     const base =
       star === selected ? 5.5 : star === observer ? 5 : star.priority >= 4 ? bright : 1.55
-    const radius = base * Math.pow(Math.max(0.8, p.f), 0.6)
+    const radius = base * Math.pow(Math.max(0.8, p.f), 0.6) * sizeScales.star
     if (star.priority >= 4 || star === selected || star === observer) {
-      const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 5.5)
+      const haloRadius: number = radius * 5.5 * sizeScales.halo
+      const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, haloRadius)
       halo.addColorStop(0, `${star.color}99`)
       halo.addColorStop(0.25, `${star.color}55`)
       halo.addColorStop(1, `${star.color}00`)
       ctx.fillStyle = halo
       ctx.beginPath()
-      ctx.arc(p.x, p.y, radius * 5.5, 0, TAU)
+      ctx.arc(p.x, p.y, haloRadius, 0, TAU)
       ctx.fill()
     }
     ctx.beginPath()
