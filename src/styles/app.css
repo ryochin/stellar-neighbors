@@ -528,13 +528,13 @@ canvas {
     min-height: 370px;
     order: 0;
   }
+  /* The page scrolls as one; only the star list keeps its own scroll box. */
   .side {
     order: 1;
-    min-height: 520px;
+    overflow-y: visible;
     border-right: 0;
     border-top: 1px solid var(--edge);
     padding: 18px;
-    max-height: 650px;
   }
   /* Legend on its own row, the buttons below it, instead of a tall column of buttons. */
   .stage-top {
