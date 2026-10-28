@@ -24,6 +24,10 @@ export const MAX_ZOOM = 12
 // Drag may reach the poles: project() rotates explicitly, so pitch ±π/2 has no singularity.
 export const PITCH_LIMIT = Math.PI / 2
 const PERSPECTIVE_DISTANCE = 240
+// Cube units that fit across the stage at zoom 1. Wide stages are fitted to the height; tall
+// (phone) stages to the width, where the rotated cube needs more room; 150 picked by the user.
+const VIEW_SPAN_X = 150
+const VIEW_SPAN_Y = 144
 
 // Small enough to keep the axis labels clear of the toolbar and legend on a 1440px screen.
 const DEFAULT_ZOOM = 0.95
@@ -74,7 +78,7 @@ export function project(angles: CameraAngles, viewport: Viewport, [x, y, z]: Vec
   const up = z * cp - yy * sp
   const depth = yy * cp + z * sp
   const f = PERSPECTIVE_DISTANCE / (PERSPECTIVE_DISTANCE - depth)
-  const scale = Math.min(viewport.width / 140, viewport.height / 144) * angles.zoom
+  const scale = Math.min(viewport.width / VIEW_SPAN_X, viewport.height / VIEW_SPAN_Y) * angles.zoom
   return {
     x: viewport.width * 0.51 + xx * scale * f,
     y: viewport.height * 0.5 - up * scale * f,

@@ -411,6 +411,18 @@ canvas {
   line-height: 1.85;
   text-shadow: 0 1px 3px #000;
 }
+/* Touch screens get their own instructions: no wheel, keys or double-click there. */
+.instructions .for-touch {
+  display: none;
+}
+@media (pointer: coarse) {
+  .instructions .for-mouse {
+    display: none;
+  }
+  .instructions .for-touch {
+    display: inline;
+  }
+}
 .legend {
   flex: 0 1 auto;
   min-width: 200px;

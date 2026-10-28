@@ -137,6 +137,14 @@ export function drawBackground(dc: DrawContext): void {
   ctx.globalAlpha = 1
 }
 
+// Tick labels run along three cube edges; `offset` (px) puts the text beside the edge.
+const TICK_AXES: readonly { name: string; edge: (v: number) => Vec3; offset: [number, number] }[] =
+  [
+    { name: "X", edge: (v) => [v, -H, -H], offset: [-8, 12] },
+    { name: "Y", edge: (v) => [-H, v, -H], offset: [-12, 10] },
+    { name: "Z", edge: (v) => [-H, -H, v], offset: [-28, 4] },
+  ]
+
 function drawAxisTicks(dc: DrawContext, view: RenderView): void {
   const { ctx } = dc
   ctx.font = `10px ${FONT_FAMILY}`
@@ -144,12 +152,40 @@ function drawAxisTicks(dc: DrawContext, view: RenderView): void {
   ctx.fillStyle = "#aac1d6"
   for (const v of [-H, -H / 2, 0, H / 2, H]) {
     const text = formatAxisValue(v, view.unitMode)
-    let p = proj(dc, [v, -H, -H])
-    ctx.fillText(text, p.x - 8, p.y + 12)
-    p = proj(dc, [-H, v, -H])
-    ctx.fillText(text, p.x - 12, p.y + 10)
-    p = proj(dc, [-H, -H, v])
-    ctx.fillText(text, p.x - 28, p.y + 4)
+    for (const axis of TICK_AXES) {
+      const p = proj(dc, axis.edge(v))
+      ctx.fillText(text, p.x + axis.offset[0], p.y + axis.offset[1])
+    }
+  }
+}
+
+// Each axis title sits past the +50 tick, this many px further along the tick edge on screen.
+// A gap in px instead of cube units keeps it off the tick labels on small stages too.
+const AXIS_TITLE_GAP_PX = 16
+const STAGE_EDGE_MARGIN_PX = 4
+
+function drawAxisTitles(dc: DrawContext, view: RenderView): void {
+  const { ctx } = dc
+  const unit = dc.i18n.t.units[view.unitMode].label
+  ctx.fillStyle = "#89a5ba"
+  for (const axis of TICK_AXES) {
+    const from = proj(dc, axis.edge(-H))
+    const to = proj(dc, axis.edge(H))
+    const length: number = Math.hypot(to.x - from.x, to.y - from.y) || 1
+    const dx: number = (to.x - from.x) / length
+    const dy: number = (to.y - from.y) / length
+    const text = `${axis.name} (${unit})`
+    const width: number = ctx.measureText(text).width
+    const x: number = to.x + axis.offset[0] + dx * AXIS_TITLE_GAP_PX
+    // Grow the text away from the ticks (leftward when the edge points left), but keep it on the
+    // stage: narrow stages leave little room beside the cube.
+    const left: number = dx < -0.3 ? x - width : x
+    const maxLeft: number = dc.viewport.width - width - STAGE_EDGE_MARGIN_PX
+    ctx.fillText(
+      text,
+      Math.max(STAGE_EDGE_MARGIN_PX, Math.min(maxLeft, left)),
+      to.y + axis.offset[1] + dy * AXIS_TITLE_GAP_PX,
+    )
   }
 }
 
@@ -186,17 +222,7 @@ export function drawCube(dc: DrawContext, view: RenderView): void {
     ctx.fillStyle = colors[i]
     ctx.fillText(names[i], q.x - 4, q.y + 4)
   })
-  const unit = dc.i18n.t.units[view.unitMode].label
-  ctx.fillStyle = "#89a5ba"
-  const p1 = proj(dc, [55, -55, -50])
-  const p2 = proj(dc, [-55, 55, -50])
-  const p3 = proj(dc, [-55, -55, 55])
-  // Right-aligned so a long unit grows away from the cube instead of over the tick labels.
-  ctx.textAlign = "right"
-  ctx.fillText(`X (${unit})`, p1.x + 12, p1.y + 16)
-  ctx.textAlign = "start"
-  ctx.fillText(`Y (${unit})`, p2.x - 18, p2.y + 16)
-  ctx.fillText(`Z (${unit})`, p3.x - 32, p3.y + 4)
+  drawAxisTitles(dc, view)
 }
 
 // The galactic plane passes through the Sun, so relative to the observer it shifts along the pole.

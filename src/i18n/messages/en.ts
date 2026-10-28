@@ -52,6 +52,7 @@ export const en = {
     resetViewTitle: "Reset the view and return to the Sun (R)",
     instructions:
       "Drag: rotate / Wheel: zoom / Click a star: details<br />Double-click a star: observe from it / R: reset view / T: top-down view",
+    instructionsTouch: "Drag: rotate / Pinch: zoom / Tap a star: details",
   },
   units: {
     ly: { label: "ly", name: "light-years" },

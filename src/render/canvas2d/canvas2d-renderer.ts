@@ -27,6 +27,8 @@ import {
 import { advanceLabelFades, fadeElapsedMs, type LabelOpacities } from "./label-fade"
 
 const PICK_RADIUS_PX = 15
+// A fingertip covers more than a mouse pointer, so taps search a wider circle.
+const TOUCH_PICK_RADIUS_PX = 24
 const DRAG_THRESHOLD_PX = 4
 const VIEW_TRANSITION_MS = 500
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v))
@@ -181,9 +183,9 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
     requestTick()
   }
 
-  function starAt(x: number, y: number): Star | null {
+  function starAt(x: number, y: number, radius: number = PICK_RADIUS_PX): Star | null {
     let best: Star | null = null
-    let bestDistance = PICK_RADIUS_PX
+    let bestDistance: number = radius
     for (const p of projected) {
       const d = Math.hypot(x - p.x, y - p.y)
       if (d < bestDistance) {
@@ -268,7 +270,8 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   function onPointerUp(e: PointerEvent): void {
     const [x, y] = pointerPosition(e)
     if (drag.active && !drag.moved) {
-      const star = starAt(x, y)
+      const radius: number = e.pointerType === "touch" ? TOUCH_PICK_RADIUS_PX : PICK_RADIUS_PX
+      const star = starAt(x, y, radius)
       if (star) callbacks.onStarClick(star)
     }
     releasePointer(e)
