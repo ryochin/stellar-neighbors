@@ -48,11 +48,14 @@ export const en = {
     equatorTitle: "Show or hide the celestial equator (δ = 0°)",
     labelsTitle: "Cycle labels: major, all, none",
     coordinatesTitle: "Show or hide the cube, the axes and the galactic plane",
+    topDownView: "↗ Top-down view",
+    topDownViewTitle: "Look down on the galactic plane from the north galactic pole (T)",
     resetView: "↺ Reset view",
     resetViewTitle: "Reset the view and return to the Sun (R)",
     instructions:
       "Drag: rotate / Wheel: zoom / Click a star: details<br />Double-click a star: observe from it / R: reset view / T: top-down view",
-    instructionsTouch: "Drag: rotate / Pinch: zoom / Tap a star: details",
+    instructionsTouch:
+      "Drag: rotate / Pinch: zoom / Tap a star: details<br />Double-tap a star: observe from it",
   },
   units: {
     ly: { label: "ly", name: "light-years" },

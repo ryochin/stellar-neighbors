@@ -13,7 +13,7 @@ import {
 } from "../../src/render/canvas2d/camera"
 
 const viewport = { width: 1000, height: 800 }
-// min(1000 / 140, 800 / 144)
+// min(1000 / 150, 800 / 144)
 const scale = 800 / 144
 
 describe("project", () => {

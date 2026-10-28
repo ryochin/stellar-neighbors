@@ -37,11 +37,14 @@ export const ja: Messages = {
     equatorTitle: "天の赤道（δ = 0°）の表示を切り替え",
     labelsTitle: "ラベルを切り替え: 主な星、すべて、なし",
     coordinatesTitle: "立方体・座標軸・銀河面の表示を切り替え",
+    topDownView: "↗ 真上から見る",
+    topDownViewTitle: "北銀極から銀河面を見下ろす（T）",
     resetView: "↺ 視点をリセット",
     resetViewTitle: "視点を戻し、観測者を太陽に戻す（R）",
     instructions:
       "ドラッグ: 回転 / ホイール: 拡大縮小 / 星をクリック: 詳細<br />星をダブルクリック: その星から観測 / R: 視点をリセット / T: 真上から見る",
-    instructionsTouch: "ドラッグ: 回転 / ピンチ: 拡大縮小 / 星をタップ: 詳細",
+    instructionsTouch:
+      "ドラッグ: 回転 / ピンチ: 拡大縮小 / 星をタップ: 詳細<br />星をダブルタップ: その星から観測",
   },
   units: {
     ly: { label: "光年", name: "光年（light-year）" },

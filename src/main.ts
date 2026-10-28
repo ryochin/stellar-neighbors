@@ -107,7 +107,12 @@ async function loadWikipedia(): Promise<void> {
   }
 }
 
-mountToolbar(store, actions, { resetView: resetAll }, i18n)
+mountToolbar(
+  store,
+  actions,
+  { resetView: resetAll, lookFromGalacticPole: () => renderer.lookFromGalacticPole() },
+  i18n,
+)
 mountObserverBox(store, actions)
 mountDataPanel(store, actions, () => void loadStars(), i18n)
 const starList = mountStarList(store, actions, i18n)

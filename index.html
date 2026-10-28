@@ -188,6 +188,16 @@
             </div>
             <div class="tool-group">
               <button
+                class="tool touch-only"
+                id="topDown"
+                type="button"
+                title="Look down on the galactic plane from the north galactic pole (T)"
+                data-i18n="topDownView"
+                data-i18n-title="topDownViewTitle"
+              >
+                ↗ Top-down view
+              </button>
+              <button
                 class="tool"
                 id="reset"
                 type="button"
@@ -208,8 +218,8 @@
             Drag: rotate / Wheel: zoom / Click a star: details<br />Double-click a star: observe
             from it / R: reset view / T: top-down view
           </span>
-          <span class="for-touch" data-i18n="instructionsTouch">
-            Drag: rotate / Pinch: zoom / Tap a star: details
+          <span class="for-touch" data-i18n-html="instructionsTouch">
+            Drag: rotate / Pinch: zoom / Tap a star: details<br />Double-tap a star: observe from it
           </span>
         </div>
       </div>

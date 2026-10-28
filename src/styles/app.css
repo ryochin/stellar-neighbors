@@ -21,7 +21,9 @@ body {
   color: var(--ink);
 }
 .app {
+  /* dvh follows the browser bars (iPad Safari), so the stage bottom never hides behind them. */
   height: 100vh;
+  height: 100dvh;
   min-height: 540px;
   display: grid;
   grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
@@ -411,8 +413,10 @@ canvas {
   line-height: 1.85;
   text-shadow: 0 1px 3px #000;
 }
-/* Touch screens get their own instructions: no wheel, keys or double-click there. */
-.instructions .for-touch {
+/* Touch screens get their own instructions: no wheel, keys or double-click there.
+   They also get a button for the top-down view, which has only the T key otherwise. */
+.instructions .for-touch,
+.touch-only {
   display: none;
 }
 @media (pointer: coarse) {
@@ -421,6 +425,9 @@ canvas {
   }
   .instructions .for-touch {
     display: inline;
+  }
+  .touch-only {
+    display: inline-block;
   }
 }
 .legend {
@@ -658,6 +665,30 @@ canvas {
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
+}
+/* Touch: grow the hit area of the small controls over the stage to about 44px (the usual
+   minimum touch target) without changing how they look or how much room they take.
+   The insets count from inside the 1px border. */
+@media (pointer: coarse) {
+  .tool,
+  .sheet-actions button {
+    position: relative;
+  }
+  .tool::after,
+  .sheet-actions button::after,
+  .sheet-close::after {
+    content: "";
+    position: absolute;
+  }
+  .tool::after {
+    inset: -7px -3px;
+  }
+  .sheet-actions button::after {
+    inset: -9px -4px;
+  }
+  .sheet-close::after {
+    inset: -7px;
+  }
 }
 .observer-presets {
   display: flex;

@@ -24,6 +24,7 @@ import {
   type DrawContext,
   type ProjectedStar,
 } from "./draw"
+import { isDoubleTap, type Tap } from "./double-tap"
 import { advanceLabelFades, fadeElapsedMs, type LabelOpacities } from "./label-fade"
 
 const PICK_RADIUS_PX = 15
@@ -75,6 +76,9 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   // Pressed pointers by id; two of them pinch to zoom. `pinchSpread` is null outside a pinch.
   const pointers = new Map<number, { x: number; y: number }>()
   let pinchSpread: number | null = null
+  // Touch taps pair up into double taps here; `lastPointerType` keeps touch out of dblclick.
+  let lastTap: Tap<Star | null> | null = null
+  let lastPointerType: string = ""
 
   const stageElement = (): HTMLElement => {
     if (!stage) throw new Error("renderer is not mounted")
@@ -211,6 +215,7 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
 
   function onPointerDown(e: PointerEvent): void {
     if (isOnControl(e)) return
+    lastPointerType = e.pointerType
     stopCameraAnimation()
     const [x, y] = pointerPosition(e)
     // A new primary pointer means every earlier one has ended, even if its pointerup got lost.
@@ -270,11 +275,27 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   function onPointerUp(e: PointerEvent): void {
     const [x, y] = pointerPosition(e)
     if (drag.active && !drag.moved) {
-      const radius: number = e.pointerType === "touch" ? TOUCH_PICK_RADIUS_PX : PICK_RADIUS_PX
-      const star = starAt(x, y, radius)
-      if (star) callbacks.onStarClick(star)
+      const touch: boolean = e.pointerType === "touch"
+      const star = starAt(x, y, touch ? TOUCH_PICK_RADIUS_PX : PICK_RADIUS_PX)
+      if (touch) onTouchTap({ time: e.timeStamp, x, y, target: star })
+      else if (star) callbacks.onStarClick(star)
+    } else {
+      // A drag or a pinch in between breaks a double tap.
+      lastTap = null
     }
     releasePointer(e)
+  }
+
+  // The second tap of a double tap observes from the star instead of selecting it again.
+  function onTouchTap(tap: Tap<Star | null>): void {
+    const star: Star | null = tap.target
+    if (star && isDoubleTap(lastTap, tap)) {
+      lastTap = null
+      callbacks.onStarDoubleClick(star)
+      return
+    }
+    lastTap = tap
+    if (star) callbacks.onStarClick(star)
   }
 
   function releasePointer(e: PointerEvent): void {
@@ -301,6 +322,8 @@ export function createCanvas2dRenderer(callbacks: RendererCallbacks, i18n: I18n)
   }
 
   function onDoubleClick(e: MouseEvent): void {
+    // Browsers that do fire dblclick for touch would observe twice; onTouchTap handles touch.
+    if (lastPointerType === "touch") return
     if (isOnControl(e) || drag.moved || drag.previousMoved) return
     const star = starAt(...pointerPosition(e))
     if (star) callbacks.onStarDoubleClick(star)
