@@ -1,0 +1,82 @@
+<!doctype html>
+<!--
+  Template for og-image.png (1200x630). See docs/plans/active/plan-2026-10-28-og-twitter-card.md.
+  Open as file://.../og-card.html?bg=<file URL of a stage screenshot> at a 1200x630 viewport.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #070c16;
+        color: #e8f2ff;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      .map {
+        position: absolute;
+        inset: 0 0 0 300px;
+        background: center / cover no-repeat;
+      }
+      .fade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, #070c16 26%, rgba(7, 12, 22, 0.75) 42%, transparent 62%);
+      }
+      .text {
+        position: absolute;
+        left: 64px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 520px;
+      }
+      .kicker {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        color: #66dce9;
+      }
+      h1 {
+        margin: 18px 0 20px;
+        font-size: 58px;
+        font-weight: 750;
+        line-height: 1.12;
+      }
+      p {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.45;
+        color: #94a5be;
+      }
+      .cta {
+        display: inline-block;
+        margin-top: 28px;
+        padding: 10px 22px;
+        border: 2px solid #66dce9;
+        border-radius: 999px;
+        background: rgba(102, 220, 233, 0.12);
+        font-size: 22px;
+        font-weight: 700;
+        color: #66dce9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="map" id="map"></div>
+    <div class="fade"></div>
+    <div class="text">
+      <div class="kicker">STELLAR NEIGHBORS</div>
+      <h1>The Solar Neighborhood in 3D</h1>
+      <p>An interactive map of the stars around the Sun, 100 light-years across</p>
+      <div class="cta">Explore the map →</div>
+    </div>
+    <script>
+      const background = new URLSearchParams(location.search).get("bg")
+      document.getElementById("map").style.backgroundImage = `url("${background}")`
+    </script>
+  </body>
+</html>
