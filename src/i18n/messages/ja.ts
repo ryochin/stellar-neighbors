@@ -33,7 +33,7 @@ export const ja: Messages = {
     starsHeading: "星",
     starListAria: "星の一覧。選択中の星はシアン、観測者は金色で示します",
     source:
-      '「ほかの星から見る」は、星どうしの距離を幾何学的に比べるものです。視差は反映していますが、光の到達時間、固有運動、実際の空の明るさは反映していません。<br />位置と距離: <a href="https://github.com/astronexus/HYG-Database" target="_blank" rel="noopener">HYG v4.1（David Nash, CC BY-SA 4.0）</a>を加工して使用（太陽から約 173 光年以内の星を抽出し、主な星に日本語名を追加）。加工したデータも CC BY-SA 4.0 で提供します。銀河座標への変換: <a href="https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu3ast/sec_cu3ast_intro/ssec_cu3ast_intro_tansforms.html" target="_blank" rel="noopener">ESA Gaia DR3</a>。HYG はすべての星を網羅しているわけではありません。星の大きさは模式的なものです。',
+      '「ほかの星から見る」は、星どうしの距離を幾何学的に比べるものです。視差は反映していますが、光の到達時間、固有運動、実際の空の明るさは反映していません。<br />位置と距離: <a href="https://github.com/astronexus/HYG-Database" target="_blank" rel="noopener">HYG v4.1（David Nash, CC BY-SA 4.0）</a>を加工して使用（太陽から約 173 光年以内の星を抽出し、主な星に日本語名を追加）。加工したデータも CC BY-SA 4.0 で提供します。銀河座標への変換: <a href="https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu3ast/sec_cu3ast_intro/ssec_cu3ast_intro_tansforms.html" target="_blank" rel="noopener">ESA Gaia DR3</a>。HYG はすべての星を網羅しているわけではありません。星の大きさは模式的なものです。<br />ソースコード: <a href="https://github.com/ryochin/stellar-neighbors" target="_blank" rel="noopener">GitHub（MIT ライセンス）</a>',
     equatorTitle: "天の赤道（δ = 0°）の表示を切り替え",
     labelsTitle: "ラベルを切り替え: 主な星、すべて、なし",
     coordinatesTitle: "立方体・座標軸・銀河面の表示を切り替え",
