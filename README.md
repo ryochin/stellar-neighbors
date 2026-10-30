@@ -4,6 +4,7 @@
 
 **A 3D map of the stars around the Sun, in a cube 100 light-years across,<br>that you can rotate, zoom and view from another star.**
 
+[![CI](https://github.com/ryochin/stellar-neighbors/actions/workflows/ci.yml/badge.svg)](https://github.com/ryochin/stellar-neighbors/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **[Open the map →](https://stellar-neighbors.aquahill.net/)**
